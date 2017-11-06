@@ -11,4 +11,4 @@ header {
 	background-color: #8CCB55;
 }
 
-#map { height: 640px; }
+#map { min-height: 640px; }

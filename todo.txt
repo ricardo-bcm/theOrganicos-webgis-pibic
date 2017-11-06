@@ -9,9 +9,9 @@
 //Options
 $('input[type=radio][name=markerActive]').change(function() {
         if (this.value == 'markers') {
-            alert("Allot Thai Gayo Bhai");
+            alert("t1");
         }
         else if (this.value == 'cluster') {
-            alert("Transfer Thai Gayo");
+            alert("2");
         }
     });

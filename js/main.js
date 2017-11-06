@@ -18,6 +18,8 @@ satelliteLayer = new L.TileLayer(mapboxUrl, {
     accessToken: accessToken
 });
 
+
+//Add do mapa
 var map = L.map('map',{
     center: [-5.1026, -42.8082],
     zoom: 12,
@@ -101,9 +103,9 @@ function bindPopup(feature, layer) {
       }
   }  
 
-map.on('click', function(e) {
-    alert("Lon, Lat : " + e.latlng.lng + " " + e.latlng.lat)
-});  
+// map.on('click', function(e) {
+//     alert("Lon, Lat : " + e.latlng.lng + " " + e.latlng.lat)
+// });  
 
 
 //Add Controls
