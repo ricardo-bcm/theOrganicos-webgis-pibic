@@ -39,3 +39,48 @@ function addGeoJsonLayerMarkers(data) {
     markers.addData(data).addTo(map);
     controlLayers.addOverlay(markers, 'Pontos');
 }
+
+
+//LOAD JSON WITH PURE JS
+function loadJSON(path, success, error) {
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+            if (xhr.status === 200) {
+                if (success) {
+                    success(JSON.parse(xhr.responseText));
+                }
+            } else {
+                if (error) {
+                    error(xhr);
+                }
+            }
+        }
+    };
+    xhr.open("GET", path, true);
+    xhr.send();
+}
+
+
+
+//Add Fuse Search Control
+var options = {
+    position: 'topright',
+    title: 'Busca',
+    panelTitle: 'Buscador',
+    placeholder: 'Exemplo: IFPI',
+    maxResultLength: 10,
+    threshold: 0.5,
+    showInvisibleFeatures: true,
+    caseSensitive: false,
+    showResultFct: function (feature, container) {
+        "use strict";
+        props = feature.properties;
+        var name = L.DomUtil.create('b', null, container);
+        name.innerHTML = '<br/>' + props.nome;
+        container.appendChild(L.DomUtil.create('br', null, container));
+    }
+};
+
+var searchCtrl = L.control.fuseSearch(options);
+map.addControl(searchCtrl);

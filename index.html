@@ -23,7 +23,42 @@
 
 	<section class="container-fluid">
 		 <div class="row">	
-		 	<div class="col-md-3"></div>
+		 	<div class="col-md-3 d-none d-sm-block">
+		 		<div class="conteiner-fluid">
+			 		<div class="row">
+				 		<div id="search-div" class="col-md-12">
+				 			<h5>Busca</h5>
+							<input type="search" class="form-control" id="search-input" placeholder="Buscar...">
+							<ul class="list-group" id="results">
+							</ul>		 			
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-12" id="layer-control">
+							<h5>Visualização</h5>
+
+							<select class="custom-select col-md-9" id="select-layer">
+							  <option value="1" selected>Ruas</option>
+							  <option value="2" >Satélite</option>
+							</select>
+							<br><br><br>	
+
+
+							<label class="custom-control custom-radio">
+							  <input id="ruas-radio" name="radio" type="radio" class="custom-control-input" checked="true">
+							  <span class="custom-control-indicator"></span>
+							  <span class="custom-control-description">Ruas</span>
+							</label>
+							<br>
+							<label class="custom-control custom-radio">
+							  <input id="satelitte-radio" name="radio" type="radio" class="custom-control-input">
+							  <span class="custom-control-indicator"></span>
+							  <span class="custom-control-description">Satélite</span>
+							</label>
+						</div>
+					</div>
+				</div>
+		 	</div>
 		 	<div class="col-md-9" id="map"></div>
 		 </div>
 	</section>
@@ -34,7 +69,6 @@
 
 
     <script src="node_modules/jquery/dist/jquery.min.js"></script>
-    <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="node_modules/leaflet.markercluster/dist/MarkerCluster.css"/>
 	<link rel="stylesheet" type="text/css" href="node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css"/>
 	<script src="node_modules/leaflet.markercluster/dist/leaflet.markercluster.js"></script>

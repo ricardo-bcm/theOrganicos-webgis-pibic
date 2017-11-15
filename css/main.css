@@ -39,3 +39,27 @@ footer {
 	-moz-box-shadow: 1px 0px 5px 2px rgba(0,0,0,.25);
 	-box-shadow: 1px 0px 5px 2px rgba(0,0,0,.25);
 }
+
+#results {
+   position: absolute;
+   margin-top: 2px;
+   width: 90%;
+   z-index: 1001;
+}
+
+.link-class:hover{
+	background-color:#f1f1f1;
+	cursor: pointer;
+}
+
+#search-div {
+ 	margin-top: 20px;
+}
+
+#layer-control {
+	margin-top: 50px;	
+}
+
+input[type="search"]::-webkit-search-cancel-button {
+	-webkit-appearance: searchfield-cancel-button;
+}

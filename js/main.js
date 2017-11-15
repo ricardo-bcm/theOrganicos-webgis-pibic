@@ -30,59 +30,21 @@ southEast = L.latLng(-5.332669664718695, -42.37615585327149),
 bounds = L.latLngBounds(northWest, southEast);
 map.setMaxBounds(bounds);
 
-//Add Fuse Search Control
-var options = {
-    position: 'topright',
-    title: 'Busca',
-    panelTitle: 'Buscador',
-    placeholder: 'Exemplo: IFPI',
-    maxResultLength: 10,
-    threshold: 0.5,
-    showInvisibleFeatures: true,
-    caseSensitive: false,
-    showResultFct: function (feature, container) {
-        "use strict";
-        props = feature.properties;
-        var name = L.DomUtil.create('b', null, container);
-        name.innerHTML = '<br/>' + props.nome;
-        container.appendChild(L.DomUtil.create('br', null, container));
-    }
-};
-
-var searchCtrl = L.control.fuseSearch(options);
-map.addControl(searchCtrl);
-
 //Layer Control
 var baseLayers = {
     "Ruas" : streetsLayer.addTo(map),
     "Satelite" : satelliteStreetLayer
 };
-var controlLayers = L.control.layers(baseLayers, null).addTo(map);
+var controlLayers = L.control.layers(baseLayers, null);
+
+var jsonData;
 
 //Add data geoJson
-loadJSON('returnJsonOnly.php', function (data) {
+$.getJSON('returnJsonOnly.php', function (data) {
     addGeoJsonLayerWithClustering(data);
-    searchCtrl.indexFeatures(data.features, ['nome']);
+    jsonData = data;
 });
 
-function loadJSON(path, success, error) {
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === XMLHttpRequest.DONE) {
-            if (xhr.status === 200) {
-                if (success) {
-                    success(JSON.parse(xhr.responseText));
-                }
-            } else {
-                if (error) {
-                    error(xhr);
-                }
-            }
-        }
-    };
-    xhr.open("GET", path, true);
-    xhr.send();
-}
 
 // Markers Cluster
 function addGeoJsonLayerWithClustering(data) {
@@ -120,3 +82,79 @@ var scaleOpts = {
     imperial: false
 };
 L.control.scale(scaleOpts).addTo(map);
+
+
+function jsonAjax(){
+    $('#search-input').keyup(function(){
+        $("#results").html('');
+        var searchField = $('#search-input').val();
+        var regex = new RegExp(searchField, "i");
+        var count = 1;
+
+        $.each(jsonData.features,function(index, el) {
+            if(el.properties.nome.search(regex) != -1 && !isBlank(searchField)){
+                var t = '';
+                    t += '<li class="list-group-item link-class"><img src="node_modules/leaflet/dist/images/marker-icon-2x.png" height="60px" width="20px" class="img-thumbnail">  ' + el.properties.nome + '</li>'
+                $('#results').append(t);
+            }
+        });
+    });
+
+    $('#results').on('click', 'li', function() {
+        var click_txt = $(this).text().split('|');
+        var inputValue = $.trim(click_txt[0]);
+        $('#search-input').val(inputValue);
+        moveToPoint(inputValue);
+        $("#results").html('');
+    });
+}
+
+jsonAjax();
+
+
+function moveToPoint(name) {
+    $.each(jsonData.features, function(index, el) {
+            if(el.properties.nome == name){
+                var lon = el.geometry.coordinates[0],
+                    lat = el.geometry.coordinates[1];
+                latlon = [lat,lon];
+                
+                map.flyTo(latlon,14);
+            }        
+    });
+}
+
+function isBlank(str) {
+    return (!str || /^\s*$/.test(str));
+}
+
+$('#select-layer').change(function() {
+    option = $('#select-layer').val();
+    switch(option) {
+        case '1' :
+            changeToStreetLayer();
+            break;
+        case '2' :
+            changeToSatelliteLayer();
+            break;
+    }
+});
+
+
+$('#ruas-radio').click(function() {
+    changeToStreetLayer();
+});
+
+$('#satelitte-radio').click(function() {
+   changeToSatelliteLayer();
+});
+
+function changeToStreetLayer() {
+    layer = baseLayers['Satelite'];
+    map.removeLayer(layer);
+    baseLayers['Ruas'].addTo(map);
+}
+
+function changeToSatelliteLayer() {
+     baseLayers['Satelite'].addTo(map);
+}
