@@ -40,11 +40,16 @@ var controlLayers = L.control.layers(baseLayers, null);
 var jsonData;
 
 //Add data geoJson
-$.getJSON('returnJsonOnly.php', function (data) {
+/*$.getJSON('returnJsonOnly.php', function (data) {
+    addGeoJsonLayerWithClustering(data);
+    jsonData = data;
+});*/
+
+
+$.getJSON('data.geojson', function (data) {
     addGeoJsonLayerWithClustering(data);
     jsonData = data;
 });
-
 
 // Markers Cluster
 function addGeoJsonLayerWithClustering(data) {
@@ -67,7 +72,7 @@ function bindPopup(feature, layer) {
         var desc = '<div class="row">';
 
             desc += '<div class="col-md-12"><strong>' + props.nome + '</strong><br/><br/></div>';
-            desc += '<div class="col-md-12">Descrição' + '<br/>' + props.description + '<br/><br/></div>';    
+            // desc += '<div class="col-md-12">Descrição' + '<br/>' + props.description + '<br/><br/></div>';    
 
             desc += '</div>'; 
 
