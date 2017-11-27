@@ -35,7 +35,7 @@ var baseLayers = {
     "Ruas" : streetsLayer.addTo(map),
     "Satelite" : satelliteStreetLayer
 };
-var controlLayers = L.control.layers(baseLayers, null);
+var controlLayers = L.control.layers(baseLayers, null).addTo(map);
 
 var jsonData;
 
@@ -45,35 +45,77 @@ var jsonData;
     jsonData = data;
 });*/
 
+var produtores = L.layerGroup(),
+feiras = L.layerGroup(),
+comercio = L.layerGroup();
+
+controlLayers.addOverlay(produtores, 'Produtores de Orgânicos');
+controlLayers.addOverlay(feiras, 'Feiras de Orgânicos');
+controlLayers.addOverlay(comercio, 'Comércio de Orgânicos');
 
 $.getJSON('data.geojson', function (data) {
     addGeoJsonLayerWithClustering(data);
     jsonData = data;
 });
 
-// Markers Cluster
-function addGeoJsonLayerWithClustering(data) {
-    var markersCluster = L.markerClusterGroup({
+var MarkerIcon = L.Icon.extend({
+    options: {
+        shadowUrl: 'img/shadow.png',
+        iconSize: [64, 54],
+        iconAnchor: [24, 46],
+        popupAnchor: [0, -44]
+    }
+});
+
+var comercioMarkerUrl = 'img/comercio-marker.png',
+    produtorMarkerUrl = 'img/produtor-marker.png',
+    feiraMarkerUrl = 'img/feira-marker.png';
+
+//Markers
+
+var comercioMarker = new MarkerIcon({iconUrl: comercioMarkerUrl}),
+    produtorMarker = new MarkerIcon({iconUrl: produtorMarkerUrl}),
+    feiraMarker = new MarkerIcon({iconUrl: feiraMarkerUrl});
+
+var markersCluster = L.markerClusterGroup({
         disableClusteringAtZoom: 13,
         showCoverageOnHover: true,
         spiderfyOnMaxZoom: false
-    }),
+    });
+
+// Markers Cluster
+function addGeoJsonLayerWithClustering(data) {
         geoJsonLayer = L.geoJson(data, {
+            pointToLayer: function (feature, latlng) {
+                props = feature.properties;
+                if(props.current_tipo == 'Tipo Um'){
+                    return L.marker(latlng, {icon: comercioMarker});
+                } else if (props.current_tipo == 'Tipo Dois'){
+                    return L.marker(latlng, {icon: produtorMarker});
+                } else {
+                    return L.marker(latlng, {icon: feiraMarker});
+                }
+            },
             onEachFeature: bindPopup
         });
-    markersCluster.addLayer(geoJsonLayer).addTo(map);
+    //markersCluster.addLayer(geoJsonLayer).addTo(map);
+    markersCluster.addLayer(comercio).addTo(map);
+    markersCluster.addLayer(produtores).addTo(map);
+    markersCluster.addLayer(feiras).addTo(map);
     controlLayers.addOverlay(markersCluster, 'Pontos');
 }
 
 function bindPopup(feature, layer) {
     feature.layer = layer;
     props = feature.properties;
+    if(props.current_tipo == 'Tipo Dois'){
+        comercio.addLayer(layer);
+    } else {
+        produtores.addLayer(layer);
+    }
     if (props) {
         var desc = '<div class="row">';
-
             desc += '<div class="col-md-12"><strong>' + props.nome + '</strong><br/><br/></div>';
-            // desc += '<div class="col-md-12">Descrição' + '<br/>' + props.description + '<br/><br/></div>';    
-
             desc += '</div>'; 
 
         layer.bindPopup(desc);
@@ -99,7 +141,10 @@ function jsonAjax(){
         $.each(jsonData.features,function(index, el) {
             if(el.properties.nome.search(regex) != -1 && !isBlank(searchField)){
                 var t = '';
-                    t += '<li class="list-group-item link-class"><img src="node_modules/leaflet/dist/images/marker-icon-2x.png" height="60px" width="20px" class="img-thumbnail">  ' + el.properties.nome + '</li>'
+                    t += '<li class="list-group-item link-class">';
+                    t += '<img src="'+ setIconForSearch(el.properties.current_tipo) +'" height="80px" width="40px" class="img-thumbnail">  ';
+                    t += el.properties.nome;
+                    t += '</li>';
                 $('#results').append(t);
             }
         });
@@ -113,6 +158,26 @@ function jsonAjax(){
         $("#results").html('');
     });
 }
+
+
+function setIconForSearch(tipo) {
+    icon = '';
+
+    switch(tipo) {
+        case 'Tipo Um' :
+            icon = comercioMarkerUrl;
+            break;
+        case 'Tipo Dois' :
+            icon = produtorMarkerUrl;
+            break;
+        case 'Tipo Tres' :
+            icon = feiraMarkerUrl;
+            break;
+    }
+
+    return icon;
+}
+
 
 jsonAjax();
 
@@ -143,15 +208,6 @@ $('#select-layer').change(function() {
             changeToSatelliteLayer();
             break;
     }
-});
-
-
-$('#ruas-radio').click(function() {
-    changeToStreetLayer();
-});
-
-$('#satelitte-radio').click(function() {
-   changeToSatelliteLayer();
 });
 
 function changeToStreetLayer() {

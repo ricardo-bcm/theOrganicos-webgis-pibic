@@ -15,18 +15,38 @@
 	</head>
 <body>
 
-	<header class="page-header">
-			<nav class="navbar navbar-light" id="navbar">
+			<nav class="navbar navbar-light navbar-expand-md">
 				<a class="navbar-brand" id="title-navbar" href="#">
+					<img src="img/logo.png" height="60" width="60" alt="">
 					TheOrgânicos
 				</a>
+				<!-- <p class="navbar-text" id="nav-text">Sistema de Informação Geográfica de Alimentos <br> Orgânicos e Agroecológicos de Teresina</p> -->
+				<button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+				  	<span> </span>
+				    <span> </span>
+				    <span> </span>
+				</button>
+
+				<div class="collapse navbar-collapse" id="navbarNavDropdown" >
+				  <ul class="navbar-nav ml-auto">
+				    <li class="nav-item">
+				      <a class="nav-link" id="nav-text-link" href="#">Sobre</a>
+				    </li>
+				    <li class="nav-item">
+				      <a class="nav-link" id="nav-text-link" href="#">Contato</a>
+				    </li>
+				    <li class="nav-item">
+				      <a class="nav-link" id="nav-text-link" href="#">Faça Parte</a>
+				    </li>
+				</ul>
+				</div>
+
 			</nav>	
-	</header>
 
 	<section class="container-fluid">
 		 <div class="row">	
 		 	<div class="col-md-3 d-none d-sm-block">
-		 		<div class="conteiner-fluid">
+		 		<div class="container">
 			 		<div class="row">
 					 		<div id="search-div" class="col-md-12">
 								<input type="search" class="form-control" id="search-input" placeholder="Buscar..." onclick="select()">
@@ -41,18 +61,6 @@
 							  	<option value="1" >Ruas</option>
 							  	<option value="2" >Satélite</option>
 							</select>
-
-							<!-- <label class="custom-control custom-radio">
-							  <input id="ruas-radio" name="radio" type="radio" class="custom-control-input" checked="true">
-							  <span class="custom-control-indicator"></span>
-							  <span class="custom-control-description">Ruas</span>
-							</label>
-							<br>
-							<label class="custom-control custom-radio">
-							  <input id="satelitte-radio" name="radio" type="radio" class="custom-control-input">
-							  <span class="custom-control-indicator"></span>
-							  <span class="custom-control-description">Satélite</span>
-							</label> -->
 						</div>
 					</div>
 				</div>
@@ -61,12 +69,23 @@
 		 </div>
 	</section>
 
-	<footer class="footer"></footer>
+	<footer class="footer">&copy;2017
+		<script language="JavaScript" type="text/javascript">
+			startYear = 2017;
+    		now = new Date
+    		theYear=now.getYear()
+    		if (theYear < 1900)
+    		theYear=theYear+1900
+    		if(theYear > startYear)
+    		document.write('- ' + theYear)
+    	</script>
+    	  Todos os direitos reservados.</footer>
 
 
 
 
     <script src="node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
 	<link rel="stylesheet" type="text/css" href="node_modules/leaflet.markercluster/dist/MarkerCluster.css"/>
 	<link rel="stylesheet" type="text/css" href="node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css"/>
 	<script src="node_modules/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
