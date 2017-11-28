@@ -14,28 +14,34 @@ var streetsLayer = new L.TileLayer(mapboxUrl, {
         accessToken: accessToken
     });
 
-//Add map
+//Adicão do mapa
 var map = L.map('map', {
     center: [-5.1026, -42.8082],
     zoom: 12,
     minZoom: 12,
     maxZoom: 18,
+    zoomControl: false,
     closePopupOnClick: true,
     attributionControl: true
 });
 
 
+//Botões de Zoom
+var zoomHome = L.Control.zoomHome().addTo(map);
+var zoom_bar = new L.Control.ZoomBar({position: 'topright'}).addTo(map);
+
+//Cerca geográfica de visualizãção
 var northWest = L.latLng(-4.904886794837085, -43.18674087524414),
 southEast = L.latLng(-5.332669664718695, -42.37615585327149),
 bounds = L.latLngBounds(northWest, southEast);
 map.setMaxBounds(bounds);
 
-//Layer Control
+//Controle de camadas
 var baseLayers = {
     "Ruas" : streetsLayer.addTo(map),
     "Satelite" : satelliteStreetLayer
 };
-var controlLayers = L.control.layers(baseLayers, null).addTo(map);
+var controlLayers = L.control.layers(baseLayers, null);
 
 var jsonData;
 
@@ -46,18 +52,21 @@ var jsonData;
 });*/
 
 var produtores = L.layerGroup(),
-feiras = L.layerGroup(),
-comercio = L.layerGroup();
+    feiras = L.layerGroup(),
+    comercio = L.layerGroup();
 
 controlLayers.addOverlay(produtores, 'Produtores de Orgânicos');
 controlLayers.addOverlay(feiras, 'Feiras de Orgânicos');
 controlLayers.addOverlay(comercio, 'Comércio de Orgânicos');
+
 
 $.getJSON('data.geojson', function (data) {
     addGeoJsonLayerWithClustering(data);
     jsonData = data;
 });
 
+
+//Marcadores
 var MarkerIcon = L.Icon.extend({
     options: {
         shadowUrl: 'img/shadow.png',
@@ -71,8 +80,6 @@ var comercioMarkerUrl = 'img/comercio-marker.png',
     produtorMarkerUrl = 'img/produtor-marker.png',
     feiraMarkerUrl = 'img/feira-marker.png';
 
-//Markers
-
 var comercioMarker = new MarkerIcon({iconUrl: comercioMarkerUrl}),
     produtorMarker = new MarkerIcon({iconUrl: produtorMarkerUrl}),
     feiraMarker = new MarkerIcon({iconUrl: feiraMarkerUrl});
@@ -83,25 +90,22 @@ var markersCluster = L.markerClusterGroup({
         spiderfyOnMaxZoom: false
     });
 
-// Markers Cluster
+//Agrupador de marcadores
 function addGeoJsonLayerWithClustering(data) {
-        geoJsonLayer = L.geoJson(data, {
-            pointToLayer: function (feature, latlng) {
-                props = feature.properties;
-                if(props.current_tipo == 'Tipo Um'){
-                    return L.marker(latlng, {icon: comercioMarker});
-                } else if (props.current_tipo == 'Tipo Dois'){
-                    return L.marker(latlng, {icon: produtorMarker});
-                } else {
-                    return L.marker(latlng, {icon: feiraMarker});
-                }
-            },
-            onEachFeature: bindPopup
-        });
-    //markersCluster.addLayer(geoJsonLayer).addTo(map);
-    markersCluster.addLayer(comercio).addTo(map);
-    markersCluster.addLayer(produtores).addTo(map);
-    markersCluster.addLayer(feiras).addTo(map);
+    geoJsonLayer = L.geoJson(data, {
+        pointToLayer: function (feature, latlng) {
+            props = feature.properties;
+            if(props.current_tipo == 'Tipo Um'){
+                return L.marker(latlng, {icon: comercioMarker});
+            } else if (props.current_tipo == 'Tipo Dois'){
+                return L.marker(latlng, {icon: produtorMarker});
+            } else {
+                return L.marker(latlng, {icon: feiraMarker});
+            }
+        },
+        onEachFeature: bindPopup
+    });
+    markersCluster.addLayer(geoJsonLayer).addTo(map);
     controlLayers.addOverlay(markersCluster, 'Pontos');
 }
 
@@ -123,7 +127,6 @@ function bindPopup(feature, layer) {
     }
 } 
 
-//Add Controls
 var scaleOpts = {
     metric: true,
     imperial: false
@@ -131,7 +134,9 @@ var scaleOpts = {
 L.control.scale(scaleOpts).addTo(map);
 
 
-function jsonAjax(){
+jsonAjaxSearch();
+
+function jsonAjaxSearch(){
     $('#search-input').keyup(function(){
         $("#results").html('');
         var searchField = $('#search-input').val();
@@ -162,7 +167,6 @@ function jsonAjax(){
 
 function setIconForSearch(tipo) {
     icon = '';
-
     switch(tipo) {
         case 'Tipo Um' :
             icon = comercioMarkerUrl;
@@ -174,23 +178,18 @@ function setIconForSearch(tipo) {
             icon = feiraMarkerUrl;
             break;
     }
-
     return icon;
 }
 
-
-jsonAjax();
-
-
 function moveToPoint(name) {
     $.each(jsonData.features, function(index, el) {
-            if(el.properties.nome == name){
-                var lon = el.geometry.coordinates[0],
-                    lat = el.geometry.coordinates[1];
+        if(el.properties.nome == name){
+            var lon = el.geometry.coordinates[0],
+                lat = el.geometry.coordinates[1];
                 latlon = [lat,lon];
                 
                 map.flyTo(latlon,14);
-            }        
+        }        
     });
 }
 
