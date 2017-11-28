@@ -14,6 +14,14 @@ var streetsLayer = new L.TileLayer(mapboxUrl, {
         accessToken: accessToken
     });
 
+var streetsMinimap = new L.TileLayer(mapboxUrl, {
+    attribution: attrib,
+    id: 'mapbox.streets',
+    minZoom: 8,
+    maxZoom: 12,
+    accessToken: accessToken
+    });
+
 //Adicão do mapa
 var map = L.map('map', {
     center: [-5.1026, -42.8082],
@@ -25,10 +33,17 @@ var map = L.map('map', {
     attributionControl: true
 });
 
+var miniMapOptions = {
+    toggleDisplay: true,
+    width : 120,
+    height : 120
+};
+
+//Minimapa
+var minimap = new L.Control.MiniMap(streetsMinimap, miniMapOptions).addTo(map);
 
 //Botões de Zoom
 var zoomHome = L.Control.zoomHome().addTo(map);
-var zoom_bar = new L.Control.ZoomBar({position: 'topright'}).addTo(map);
 
 //Cerca geográfica de visualizãção
 var northWest = L.latLng(-4.904886794837085, -43.18674087524414),
@@ -70,7 +85,7 @@ $.getJSON('data.geojson', function (data) {
 var MarkerIcon = L.Icon.extend({
     options: {
         shadowUrl: 'img/shadow.png',
-        iconSize: [64, 54],
+        iconSize: [84, 71],
         iconAnchor: [24, 46],
         popupAnchor: [0, -44]
     }
