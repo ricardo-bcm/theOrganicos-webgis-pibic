@@ -1,6 +1,6 @@
 :root {
 	--main-color : #7ABA7A;
-	--main-text-color : #118C4E;
+	--main-text-color : #FFF;
 }
 
 html, body, .container-fluid {
@@ -70,7 +70,7 @@ footer {
 }
 
 /*Busca*/
-#conteiner-inputs {
+#lateral-conteiner {
 	background-color: #F4F4F4;
 	height: 100%;
 }
@@ -101,7 +101,6 @@ footer {
 }
 
 .input-group-to-style .input-group-addon {
-    border-radius: 0;
     border-color: #CED4DA;
     background-color: #fff;
 }
@@ -116,28 +115,3 @@ footer {
             border-bottom-right-radius: 0;
 	        box-shadow:none !important;
 }
-
-//Responsividade personalizada
-/*@media only screen and (min-width : 480px) {
-	.navbar {
-		background-color: #000;
-	}
-}
-
-@media only screen and (min-width : 768px) {
-	.navbar {
-		background-color: #F00;
-	}
-}
-
-@media only screen and (min-width : 992px) {
-	.navbar {
-		background-color: #0F0;
-	}
-}
-
-@media only screen and (min-width : 1200px) {
-	.navbar {
-		background-color: #00F;
-	}
-}*/

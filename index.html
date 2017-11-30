@@ -47,7 +47,7 @@
 	<section class="container-fluid">
 		 <div class="row">	
 		 	<div class="col-md-3 d-none d-sm-block">
-		 		<div class="container" id="conteiner-inputs">
+		 		<div class="container" id="lateral-conteiner">
 			 		<div class="row">
 					 	<div id="search-div" class="col-md-12">
 							<div class="input-group input-group-to-style">
@@ -55,7 +55,12 @@
 								<input type="search" class="form-control" id="search-input" placeholder="Buscar..." onclick="select()"/>
 								<span class="input-group-addon filter-button"><i class="fa fa-filter"></i></span>		
 							</div>
-							<ul class="list-group" id="results"></ul>		 			
+							<ul class="list-group" id="results"></ul>
+						</div>
+						<div class="markers-list col-md-11">
+							<ul class="list-group" id="list-markers">
+								<li class="list-group-item active">Locais</li>
+							</ul>
 						</div>
 					</div>
 				</div>
@@ -82,15 +87,19 @@
     <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
     <link rel="stylesheet" href="css/toogler-anim-button.css">
     <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css">
-
+    <!-- Leaflet Plugins -->
     <link rel="stylesheet" href="libs/leaflet.zoomhome/dist/leaflet.zoomhome.css">
     <script src="libs/leaflet.zoomhome/dist/leaflet.zoomhome.min.js"></script>
-
+    <link rel="stylesheet" href="node_modules/leaflet-basemaps/L.Control.Basemaps.css"/>
+    <script src="node_modules/leaflet-basemaps/L.Control.Basemaps-min.js"></script>
     <link rel="stylesheet" href="node_modules/leaflet-minimap/dist/Control.MiniMap.min.css">
     <script src="node_modules/leaflet-minimap/dist/Control.MiniMap.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="node_modules/leaflet.markercluster/dist/MarkerCluster.css"/>
 	<link rel="stylesheet" type="text/css" href="node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css"/>
 	<script src="node_modules/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+    <link rel="stylesheet" href="node_modules/leaflet-mouse-position/src/L.Control.MousePosition.css"/>
+    <script src="node_modules/leaflet-mouse-position/src/L.Control.MousePosition.js"></script>
+	<!-- Fim Leaflet Plugins -->
 	<script type="text/javascript" src="js/main.js"></script>
 </body>
 </html>

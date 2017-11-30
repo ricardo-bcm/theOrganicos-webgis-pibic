@@ -1,17 +1,19 @@
 // Layers
 var mapboxUrl = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}';
 var accessToken = 'pk.eyJ1IjoicmljYXJkb2JjbSIsImEiOiJjajlrMTJkejQxaTUyMzNwZ3cxcnM3MDU2In0.pr0XFTVGiylyl6Sth57t9g';
-var attrib = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>';
+var attrib = '<a href="http://openstreetmap.org">OpenStreetMap</a> | <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a> | <a href="http://mapbox.com">Mapbox</a>';
 
 var streetsLayer = new L.TileLayer(mapboxUrl, {
     attribution: attrib,
     id: 'mapbox.streets',
-    accessToken: accessToken
+    accessToken: accessToken,
+    label: 'Estradas'
 }),
     satelliteStreetLayer = new L.TileLayer(mapboxUrl, {
         attribution: attrib,
         id: 'mapbox.streets-satellite',
-        accessToken: accessToken
+        accessToken: accessToken,
+        label: 'Satélite'
     });
 
 var streetsMinimap = new L.TileLayer(mapboxUrl, {
@@ -33,13 +35,13 @@ var map = L.map('map', {
     attributionControl: true
 });
 
+//Minimapa
 var miniMapOptions = {
+    position: 'topright',
     toggleDisplay: true,
     width : 120,
     height : 120
 };
-
-//Minimapa
 var minimap = new L.Control.MiniMap(streetsMinimap, miniMapOptions).addTo(map);
 
 //Botões de Zoom
@@ -58,6 +60,18 @@ var baseLayers = {
 };
 var controlLayers = L.control.layers(baseLayers, null);
 
+var basemaps = [
+    streetsLayer,
+    satelliteStreetLayer
+];
+
+map.addControl(L.control.basemaps({
+    basemaps : basemaps,
+    tileX: 0,
+    tileY: 0,
+    tileZ: 1
+}));
+
 var jsonData;
 
 //Add data geoJson
@@ -65,15 +79,6 @@ var jsonData;
     addGeoJsonLayerWithClustering(data);
     jsonData = data;
 });*/
-
-var produtores = L.layerGroup(),
-    feiras = L.layerGroup(),
-    comercio = L.layerGroup();
-
-controlLayers.addOverlay(produtores, 'Produtores de Orgânicos');
-controlLayers.addOverlay(feiras, 'Feiras de Orgânicos');
-controlLayers.addOverlay(comercio, 'Comércio de Orgânicos');
-
 
 $.getJSON('data.geojson', function (data) {
     addGeoJsonLayerWithClustering(data);
@@ -86,37 +91,41 @@ var MarkerIcon = L.Icon.extend({
     options: {
         shadowUrl: 'img/shadow.png',
         iconSize: [84, 71],
-        iconAnchor: [24, 46],
-        popupAnchor: [0, -44]
+        iconAnchor: [29, 63],
+        popupAnchor: [3, -61]
     }
 });
 
 var comercioMarkerUrl = 'img/comercio-marker.png',
     produtorMarkerUrl = 'img/produtor-marker.png',
-    feiraMarkerUrl = 'img/feira-marker.png';
+    feiraMarkerUrl = 'img/feira-marker.png',
+    comercioMarkerUrlSelected = 'img/comercio-marker-selected.png',
+    produtorMarkerUrlSelected = 'img/produtor-marker-selected.png',
+    feiraMarkerUrlSelected = 'img/feira-marker-selected.png';
 
-var comercioMarker = new MarkerIcon({iconUrl: comercioMarkerUrl}),
-    produtorMarker = new MarkerIcon({iconUrl: produtorMarkerUrl}),
-    feiraMarker = new MarkerIcon({iconUrl: feiraMarkerUrl});
-
+//Agrupador de marcadores
 var markersCluster = L.markerClusterGroup({
         disableClusteringAtZoom: 13,
         showCoverageOnHover: true,
         spiderfyOnMaxZoom: false
     });
 
-//Agrupador de marcadores
 function addGeoJsonLayerWithClustering(data) {
     geoJsonLayer = L.geoJson(data, {
-        pointToLayer: function (feature, latlng) {
-            props = feature.properties;
-            if(props.current_tipo == 'Tipo Um'){
-                return L.marker(latlng, {icon: comercioMarker});
-            } else if (props.current_tipo == 'Tipo Dois'){
-                return L.marker(latlng, {icon: produtorMarker});
-            } else {
-                return L.marker(latlng, {icon: feiraMarker});
+        pointToLayer: function (feature, latlng) { 
+            marker = null;  
+            switch(feature.properties.current_tipo) {
+                case 'Tipo Um' :
+                    marker = L.marker(latlng, {icon: new MarkerIcon({iconUrl: comercioMarkerUrl})});
+                    break;
+                case 'Tipo Dois' :
+                    marker = L.marker(latlng, {icon: new MarkerIcon({iconUrl: produtorMarkerUrl})});
+                    break;
+                case 'Tipo Tres' :
+                    marker = L.marker(latlng, {icon: new MarkerIcon({iconUrl: feiraMarkerUrl})});
+                    break;
             }
+            return marker;
         },
         onEachFeature: bindPopup
     });
@@ -127,20 +136,26 @@ function addGeoJsonLayerWithClustering(data) {
 function bindPopup(feature, layer) {
     feature.layer = layer;
     props = feature.properties;
-    if(props.current_tipo == 'Tipo Dois'){
-        comercio.addLayer(layer);
-    } else {
-        produtores.addLayer(layer);
-    }
     if (props) {
-        var desc = '<div class="row">';
-            desc += '<div class="col-md-12"><strong>' + props.nome + '</strong><br/><br/></div>';
-            desc += '</div>'; 
+        var description = '<div class="row">';
+            description += '<div class="col-md-12"><strong>' + props.nome + '</strong><br/><br/></div>';
+            description += '</div>'; 
 
-        layer.bindPopup(desc);
+        layer.bindPopup(description);
         layer.bindTooltip(props.nome).openTooltip();
     }
+    var linePoint = '<li class="list-group-item list-group-item-action">';
+        linePoint += props.nome;
+        linePoint += '</li>';
+    $('#list-markers').append(linePoint);
 } 
+
+// Informações
+var latLngOpts = {
+    separator: ' [] ',
+    emptyString: 'Latitude [] Longitude'
+};
+L.control.mousePosition(latLngOpts).addTo(map);
 
 var scaleOpts = {
     metric: true,
@@ -148,39 +163,33 @@ var scaleOpts = {
 };
 L.control.scale(scaleOpts).addTo(map);
 
-
-jsonAjaxSearch();
-
-function jsonAjaxSearch(){
-    $('#search-input').keyup(function(){
-        $("#results").html('');
-        var searchField = $('#search-input').val();
-        var regex = new RegExp(searchField, "i");
-        var count = 1;
-
-        $.each(jsonData.features,function(index, el) {
-            if(el.properties.nome.search(regex) != -1 && !isBlank(searchField)){
-                var t = '';
-                    t += '<li class="list-group-item link-class">';
-                    t += '<img src="'+ setIconForSearch(el.properties.current_tipo) +'" height="80px" width="40px" class="img-thumbnail">  ';
-                    t += el.properties.nome;
-                    t += '</li>';
-                $('#results').append(t);
-            }
-        });
+// Busca em tempo real (Ajax search)
+$('#search-input').keyup(function(){
+    $("#results").html('');
+    var searchField = $('#search-input').val();
+    var regex = new RegExp(searchField, "i");
+    var count = 1;
+    $.each(jsonData.features,function(index, el) {
+        if(el.properties.nome.search(regex) != -1 && !isBlank(searchField)){
+            var t = '';
+                t += '<li class="list-group-item link-class">';
+                t += '<img src="'+ setIconUrlByType(el.properties.current_tipo) +'" height="48px" width="41px" class="img-thumbnail">  ';
+                t += el.properties.nome;
+                t += '</li>';
+            $('#results').append(t);
+        }
     });
+});
 
-    $('#results').on('click', 'li', function() {
-        var click_txt = $(this).text().split('|');
-        var inputValue = $.trim(click_txt[0]);
-        $('#search-input').val(inputValue);
-        moveToPoint(inputValue);
-        $("#results").html('');
-    });
-}
+$('#results').on('click', 'li', function() {
+    var click_txt = $(this).text().split('|');
+    var inputValue = $.trim(click_txt[0]);
+    $('#search-input').val(inputValue);
+    moveToPoint(inputValue);
+    $("#results").html('');
+});
 
-
-function setIconForSearch(tipo) {
+function setIconUrlByType(tipo) {
     icon = '';
     switch(tipo) {
         case 'Tipo Um' :
@@ -196,14 +205,37 @@ function setIconForSearch(tipo) {
     return icon;
 }
 
+function setIconUrlByTypeSelected(tipo) {
+    icon = '';
+    switch(tipo) {
+        case 'Tipo Um' :
+            icon = comercioMarkerUrlSelected;
+            break;
+        case 'Tipo Dois' :
+            icon = produtorMarkerUrlSelected;
+            break;
+        case 'Tipo Tres' :
+            icon = feiraMarkerUrlSelected;
+            break;
+    }
+    return icon;
+}
+
 function moveToPoint(name) {
     $.each(jsonData.features, function(index, el) {
         if(el.properties.nome == name){
-            var lon = el.geometry.coordinates[0],
-                lat = el.geometry.coordinates[1];
-                latlon = [lat,lon];
-                
-                map.flyTo(latlon,14);
+            latlng = L.latLng(el.geometry.coordinates[1], el.geometry.coordinates[0]);
+
+                var desc = '<div class="row">';
+                    desc += '<div class="col-md-12"><strong>' + el.properties.nome + '</strong><br/><br/></div>';
+                    desc += '</div>';
+
+                markersCluster.eachLayer(function (layer) {
+                    if(layer.feature.properties.nome == name){
+                        layer.bindPopup(desc).openPopup();
+                    }
+                });                
+                map.flyTo(latlng,14);
         }        
     });
 }
@@ -233,3 +265,25 @@ function changeToStreetLayer() {
 function changeToSatelliteLayer() {
      baseLayers['Satelite'].addTo(map);
 }
+
+var prdo
+
+$(function() {
+  $('#list-markers li').hover(function() {
+      nome = $(this).text();
+      markersCluster.eachLayer(function (layer) {
+          if(layer.feature.properties.nome == nome){
+            iconUrl = setIconUrlByTypeSelected(layer.feature.properties.current_tipo);
+            layer.setIcon(new MarkerIcon({iconUrl: iconUrl}));
+          }
+      });
+
+  }, function() {
+        markersCluster.eachLayer(function (layer) {
+            if(layer.feature.properties.nome == nome){
+                iconUrl = setIconUrlByType(layer.feature.properties.current_tipo);
+                layer.setIcon(new MarkerIcon({iconUrl: iconUrl}));
+            }
+        });
+  });
+});

@@ -1,0 +1,1 @@
+- Busca feita em um cluster fechado não mostra a popup inicialmente
