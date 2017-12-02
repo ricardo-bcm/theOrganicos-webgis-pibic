@@ -19,20 +19,24 @@ var streetsLayer = new L.TileLayer(mapboxUrl, {
 var streetsMinimap = new L.TileLayer(mapboxUrl, {
     attribution: attrib,
     id: 'mapbox.streets',
-    minZoom: 8,
-    maxZoom: 12,
+    minZoom: 7,
+    maxZoom: 13 ,
     accessToken: accessToken
     });
 
 //Adicão do mapa
 var map = L.map('map', {
     center: [-5.1026, -42.8082],
-    zoom: 12,
-    minZoom: 12,
+    zoom: 11,
+    minZoom: 11,
     maxZoom: 18,
     zoomControl: false,
     closePopupOnClick: true,
     attributionControl: true
+});
+
+map.on('contextmenu', function(e) {
+    event.preventDefault();
 });
 
 //Minimapa
@@ -72,6 +76,19 @@ map.addControl(L.control.basemaps({
     tileZ: 1
 }));
 
+// Layers de cada tipo
+var produtoresLayerToControl = L.featureGroup(),
+feirasLayerToControl = L.featureGroup(),
+comercioLayerToControl = L.featureGroup();
+
+controlLayers.addOverlay(produtoresLayerToControl, 'Produtores de Orgânicos');
+controlLayers.addOverlay(feirasLayerToControl, 'Feiras de Orgânicos');
+controlLayers.addOverlay(comercioLayerToControl, 'Comércio de Orgânicos');
+
+var produtores = L.layerGroup();
+var feiras = L.layerGroup();
+var comercio = L.layerGroup();
+
 var jsonData;
 
 //Add data geoJson
@@ -80,9 +97,36 @@ var jsonData;
     jsonData = data;
 });*/
 
+
+$(".filter-button").click(function(){
+    $("#layers-type").toggle(400);
+});
+
+
 $.getJSON('data.geojson', function (data) {
-    addGeoJsonLayerWithClustering(data);
     jsonData = data;
+    geoJsonLayer = L.geoJson(data, {
+        pointToLayer: function (feature, latlng) { 
+            marker = null;  
+            switch(feature.properties.current_tipo) {
+                case 'Comercio' :
+                    marker = L.marker(latlng, {icon: new MarkerIcon({iconUrl: comercioMarkerUrl})});
+                    break;
+                case 'Produtor' :
+                    marker = L.marker(latlng, {icon: new MarkerIcon({iconUrl: produtorMarkerUrl})});
+                    break;
+                case 'Feira' :
+                    marker = L.marker(latlng, {icon: new MarkerIcon({iconUrl: feiraMarkerUrl})});
+                    break;
+            }
+            return marker;
+        },
+        onEachFeature: bindPopup
+    });
+    produtoresLayerToControl.addTo(map);
+    feirasLayerToControl.addTo(map);
+    comercioLayerToControl.addTo(map);
+    markersCluster.addTo(map);
 });
 
 
@@ -110,29 +154,6 @@ var markersCluster = L.markerClusterGroup({
         spiderfyOnMaxZoom: false
     });
 
-function addGeoJsonLayerWithClustering(data) {
-    geoJsonLayer = L.geoJson(data, {
-        pointToLayer: function (feature, latlng) { 
-            marker = null;  
-            switch(feature.properties.current_tipo) {
-                case 'Tipo Um' :
-                    marker = L.marker(latlng, {icon: new MarkerIcon({iconUrl: comercioMarkerUrl})});
-                    break;
-                case 'Tipo Dois' :
-                    marker = L.marker(latlng, {icon: new MarkerIcon({iconUrl: produtorMarkerUrl})});
-                    break;
-                case 'Tipo Tres' :
-                    marker = L.marker(latlng, {icon: new MarkerIcon({iconUrl: feiraMarkerUrl})});
-                    break;
-            }
-            return marker;
-        },
-        onEachFeature: bindPopup
-    });
-    markersCluster.addLayer(geoJsonLayer).addTo(map);
-    controlLayers.addOverlay(markersCluster, 'Pontos');
-}
-
 function bindPopup(feature, layer) {
     feature.layer = layer;
     props = feature.properties;
@@ -144,11 +165,76 @@ function bindPopup(feature, layer) {
         layer.bindPopup(description);
         layer.bindTooltip(props.nome).openTooltip();
     }
+
+    switch (props.current_tipo) {
+        case 'Comercio':
+            comercio.addLayer(layer);
+            break;
+        case 'Feira':
+            feiras.addLayer(layer);
+            break;
+        case 'Produtor' :
+            produtores.addLayer(layer);
+            break;
+    }
+
     var linePoint = '<li class="list-group-item list-group-item-action">';
         linePoint += props.nome;
         linePoint += '</li>';
     $('#list-markers').append(linePoint);
 } 
+
+map.on('layeradd ', function(e) {
+    if(e.layer === comercioLayerToControl) {
+        markersCluster.addLayer(comercio);
+    }
+    if(e.layer === feirasLayerToControl) {
+        markersCluster.addLayer(feiras);
+    }
+    if(e.layer === produtoresLayerToControl) {
+        markersCluster.addLayer(produtores);
+    }
+});
+
+map.on('layerremove', function(e) {
+    if(e.layer === comercioLayerToControl) {
+        markersCluster.removeLayer(comercio);
+    }
+    if(e.layer === feirasLayerToControl) {
+        markersCluster.removeLayer(feiras);
+    }
+    if(e.layer === produtoresLayerToControl) {
+        markersCluster.removeLayer(produtores);
+    }
+});
+
+
+$('#switch-produtor').on('change', function(e) {
+    if($(this).is(':checked')) {
+        map.addLayer(produtoresLayerToControl);
+    }  
+    if($(this).is(':not(:checked)')) {
+        map.removeLayer(produtoresLayerToControl);
+    }
+});
+
+$('#switch-comercio').on('change', function(e) {
+    if($(this).is(':checked')) {
+        map.addLayer(comercioLayerToControl);
+    }  
+    if($(this).is(':not(:checked)')) {
+        map.removeLayer(comercioLayerToControl);
+    }
+});
+
+$('#switch-feira').on('change', function(e) {
+    if($(this).is(':checked')) {
+        map.addLayer(feirasLayerToControl);
+    }  
+    if($(this).is(':not(:checked)')) {
+        map.removeLayer(feirasLayerToControl);
+    }
+});
 
 // Informações
 var latLngOpts = {
@@ -165,18 +251,19 @@ L.control.scale(scaleOpts).addTo(map);
 
 // Busca em tempo real (Ajax search)
 $('#search-input').keyup(function(){
-    $("#results").html('');
+    document.getElementById('results').innerHTML = '';
     var searchField = $('#search-input').val();
     var regex = new RegExp(searchField, "i");
-    var count = 1;
+    var count = 0;
     $.each(jsonData.features,function(index, el) {
-        if(el.properties.nome.search(regex) != -1 && !isBlank(searchField)){
-            var t = '';
-                t += '<li class="list-group-item link-class">';
-                t += '<img src="'+ setIconUrlByType(el.properties.current_tipo) +'" height="48px" width="41px" class="img-thumbnail">  ';
-                t += el.properties.nome;
-                t += '</li>';
-            $('#results').append(t);
+        if(el.properties.nome.search(regex) != -1 && !isBlank(searchField) && count < 5  ){
+            var listSearch = '';
+                listSearch += '<li class="list-group-item link-class">';
+                listSearch += '<img src="'+ setIconUrlByType(el.properties.current_tipo) +'" height="48px" width="41px" class="img-thumbnail">  ';
+                listSearch += el.properties.nome;
+                listSearch += '</li>';
+            document.getElementById('results').innerHTML += listSearch;
+            count = count + 1;
         }
     });
 });
@@ -186,19 +273,19 @@ $('#results').on('click', 'li', function() {
     var inputValue = $.trim(click_txt[0]);
     $('#search-input').val(inputValue);
     moveToPoint(inputValue);
-    $("#results").html('');
+    document.getElementById('results').innerHTML = '';
 });
 
 function setIconUrlByType(tipo) {
     icon = '';
     switch(tipo) {
-        case 'Tipo Um' :
+        case 'Comercio' :
             icon = comercioMarkerUrl;
             break;
-        case 'Tipo Dois' :
+        case 'Produtor' :
             icon = produtorMarkerUrl;
             break;
-        case 'Tipo Tres' :
+        case 'Feira' :
             icon = feiraMarkerUrl;
             break;
     }
@@ -208,65 +295,51 @@ function setIconUrlByType(tipo) {
 function setIconUrlByTypeSelected(tipo) {
     icon = '';
     switch(tipo) {
-        case 'Tipo Um' :
+        case 'Comercio' :
             icon = comercioMarkerUrlSelected;
             break;
-        case 'Tipo Dois' :
+        case 'Produtor' :
             icon = produtorMarkerUrlSelected;
             break;
-        case 'Tipo Tres' :
+        case 'Feira' :
             icon = feiraMarkerUrlSelected;
             break;
     }
     return icon;
 }
 
-function moveToPoint(name) {
+function moveToPoint(name,) {
+    var controle = 0;
     $.each(jsonData.features, function(index, el) {
         if(el.properties.nome == name){
             latlng = L.latLng(el.geometry.coordinates[1], el.geometry.coordinates[0]);
 
-                var desc = '<div class="row">';
-                    desc += '<div class="col-md-12"><strong>' + el.properties.nome + '</strong><br/><br/></div>';
-                    desc += '</div>';
+            map.flyTo(latlng,14);
+          
+            map.on('zoomend', function(e) {
+                if(controle == 0) {
+                    openPopUp(name); 
+                }
+                controle = 1;
+            });
+        }
+    });
+}
 
-                markersCluster.eachLayer(function (layer) {
-                    if(layer.feature.properties.nome == name){
-                        layer.bindPopup(desc).openPopup();
-                    }
-                });                
-                map.flyTo(latlng,14);
-        }        
+function openPopUp(name) {
+    markersCluster.eachLayer(function (layer) {
+        if(layer.feature.properties.nome == name){
+            var desc = '<div class="row">';
+                desc += '<div class="col-md-12"><strong>' + name + '</strong><br/><br/></div>';
+                desc += '</div>';
+            layer.bindPopup(desc).openPopup();
+        }
     });
 }
 
 function isBlank(str) {
     return (!str || /^\s*$/.test(str));
 }
-
-$('#select-layer').change(function() {
-    option = $('#select-layer').val();
-    switch(option) {
-        case '1' :
-            changeToStreetLayer();
-            break;
-        case '2' :
-            changeToSatelliteLayer();
-            break;
-    }
-});
-
-function changeToStreetLayer() {
-    layer = baseLayers['Satelite'];
-    map.removeLayer(layer);
-    baseLayers['Ruas'].addTo(map);
-}
-
-function changeToSatelliteLayer() {
-     baseLayers['Satelite'].addTo(map);
-}
-
-var prdo
 
 $(function() {
   $('#list-markers li').hover(function() {

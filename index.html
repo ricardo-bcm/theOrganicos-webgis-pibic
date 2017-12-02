@@ -11,11 +11,17 @@
     	<link rel="icon" href="img/logo16x16.png">
     	<link rel="icon" href="img/logo32x32.png">
     	<link rel="icon" href="img/logo96x96.png">
-
+		<link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css">
 		<link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css"/>
 		<link rel="stylesheet" href="node_modules/leaflet/dist/leaflet.css"/>
-		<script src="node_modules/leaflet/dist/leaflet.js"></script>
-		<link rel="stylesheet" type="text/css" href="css/main.css">
+		<link rel="stylesheet" href="css/toogler-anim-button.css">
+		<link rel="stylesheet" href="css/main.css">
+    	<link rel="stylesheet" href="libs/leaflet.zoomhome/dist/leaflet.zoomhome.css"/>
+	    <link rel="stylesheet" href="node_modules/leaflet-basemaps/L.Control.Basemaps.css"/>
+	    <link rel="stylesheet" href="node_modules/leaflet-minimap/dist/Control.MiniMap.min.css">
+	    <link rel="stylesheet" type="text/css" href="node_modules/leaflet.markercluster/dist/MarkerCluster.css"/>
+	    <link rel="stylesheet" type="text/css" href="node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css"/>
+	    <link rel="stylesheet" href="node_modules/leaflet-mouse-position/src/L.Control.MousePosition.css"/>
 	</head>
 <body>
 
@@ -47,8 +53,8 @@
 	<section class="container-fluid">
 		 <div class="row">	
 		 	<div class="col-md-3 d-none d-sm-block">
-		 		<div class="container" id="lateral-conteiner">
-			 		<div class="row">
+			 	<div class="row">
+			 		<div id="information-wrapper">
 					 	<div id="search-div" class="col-md-12">
 							<div class="input-group input-group-to-style">
 								<span class="input-group-addon"><i class="fa fa-search"></i></span>
@@ -57,49 +63,44 @@
 							</div>
 							<ul class="list-group" id="results"></ul>
 						</div>
-						<div class="markers-list col-md-11">
-							<ul class="list-group" id="list-markers">
-								<li class="list-group-item active">Locais</li>
-							</ul>
-						</div>
+						<div id="layers-type">
+		                        Produtor
+		                        <div class="material-switch pull-right">
+		                            <input id="switch-produtor" type="checkbox" checked />
+		                            <label for="switch-produtor" class="switch-prod-label"></label>
+		                        </div> <br><br>
+		                        Comercio
+		                        <div class="material-switch pull-right">
+		                            <input id="switch-comercio" type="checkbox" checked/>
+		                            <label for="switch-comercio" class="switch-com-label"></label>
+		                        </div><br><br>
+		                        Feira 
+		                        <div class="material-switch pull-right">
+		                            <input id="switch-feira" type="checkbox" checked/>
+		                            <label for="switch-feira" class="switch-feira-label"></label>
+		                        </div>
+		                </div>
+		                <div id="divider"><p>Localizações</p></div>
+						<ul class="list-group" id="list-markers"></ul>
 					</div>
 				</div>
 		 	</div>
-		 	<div class="col-md-9" id="map"></div>
+		 	<div class="col-md-9">
+		 		<div id="map"></div>
+		 	</div>
 		 </div>
 	</section>
 
-	<footer class="footer">
-		&copy;2017
-		<script type="text/javascript">
-			startYear = 2017;
-    		now = new Date
-    		theYear=now.getYear()
-    		if (theYear < 1900)
-    		theYear=theYear+1900
-    		if(theYear > startYear)
-    		document.write('- ' + theYear)
-    	</script>
-    	Todos os direitos reservados.
-    </footer>
-
+	
+	<script src="node_modules/leaflet/dist/leaflet.js"></script>
     <script src="node_modules/jquery/dist/jquery.min.js"></script>
     <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
-    <link rel="stylesheet" href="css/toogler-anim-button.css">
-    <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css">
     <!-- Leaflet Plugins -->
-    <link rel="stylesheet" href="libs/leaflet.zoomhome/dist/leaflet.zoomhome.css">
     <script src="libs/leaflet.zoomhome/dist/leaflet.zoomhome.min.js"></script>
-    <link rel="stylesheet" href="node_modules/leaflet-basemaps/L.Control.Basemaps.css"/>
     <script src="node_modules/leaflet-basemaps/L.Control.Basemaps-min.js"></script>
-    <link rel="stylesheet" href="node_modules/leaflet-minimap/dist/Control.MiniMap.min.css">
     <script src="node_modules/leaflet-minimap/dist/Control.MiniMap.min.js"></script>
-	<link rel="stylesheet" type="text/css" href="node_modules/leaflet.markercluster/dist/MarkerCluster.css"/>
-	<link rel="stylesheet" type="text/css" href="node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css"/>
 	<script src="node_modules/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
-    <link rel="stylesheet" href="node_modules/leaflet-mouse-position/src/L.Control.MousePosition.css"/>
     <script src="node_modules/leaflet-mouse-position/src/L.Control.MousePosition.js"></script>
-	<!-- Fim Leaflet Plugins -->
-	<script type="text/javascript" src="js/main.js"></script>
+	<script src="js/main.js"></script>
 </body>
 </html>
