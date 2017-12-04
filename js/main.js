@@ -1,3 +1,8 @@
+/*
+    Autor: Ricardo Barbosa
+    Email: ricardobcm@outlook.com
+*/
+
 // Layers
 var mapboxUrl = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}';
 var accessToken = 'pk.eyJ1IjoicmljYXJkb2JjbSIsImEiOiJjajlrMTJkejQxaTUyMzNwZ3cxcnM3MDU2In0.pr0XFTVGiylyl6Sth57t9g';
@@ -36,7 +41,7 @@ var map = L.map('map', {
 });
 
 map.on('contextmenu', function(e) {
-    event.preventDefault();
+    e.preventDefault();
 });
 
 //Minimapa
@@ -177,12 +182,44 @@ function bindPopup(feature, layer) {
             produtores.addLayer(layer);
             break;
     }
-
-    var linePoint = '<li class="list-group-item list-group-item-action">';
-        linePoint += props.nome;
-        linePoint += '</li>';
-    $('#list-markers').append(linePoint);
 } 
+
+
+function sycronizeListMarkers() {
+    document.getElementById('list-markers').innerHTML = '';
+    var linePoint = '';
+    markersCluster.eachLayer(function (layer) {
+        linePoint += '<li class="list-group-item list-group-item-action">';
+        linePoint += layer.feature.properties.nome;
+        linePoint += '</li>';
+    });
+    $('#list-markers').append(linePoint);
+}
+
+function updateEventsOnMarkers() {
+    $('#list-markers li').click(function() {
+        nome = $(this).text();
+        moveToPoint(nome);
+    });
+
+    $('#list-markers li').hover(function() {
+        nome = $(this).text();
+        markersCluster.eachLayer(function (layer) {
+            if(layer.feature.properties.nome == nome){
+                iconUrl = setIconUrlByTypeSelected(layer.feature.properties.current_tipo);
+                layer.setIcon(new MarkerIcon({iconUrl: iconUrl}));
+            }
+        });
+    },
+    function() {
+        markersCluster.eachLayer(function (layer) {
+            if(layer.feature.properties.nome == nome){
+                iconUrl = setIconUrlByType(layer.feature.properties.current_tipo);
+                layer.setIcon(new MarkerIcon({iconUrl: iconUrl}));
+            }
+        });
+    });
+}
 
 map.on('layeradd ', function(e) {
     if(e.layer === comercioLayerToControl) {
@@ -194,6 +231,8 @@ map.on('layeradd ', function(e) {
     if(e.layer === produtoresLayerToControl) {
         markersCluster.addLayer(produtores);
     }
+    sycronizeListMarkers();
+    updateEventsOnMarkers();
 });
 
 map.on('layerremove', function(e) {
@@ -206,6 +245,8 @@ map.on('layerremove', function(e) {
     if(e.layer === produtoresLayerToControl) {
         markersCluster.removeLayer(produtores);
     }
+    sycronizeListMarkers();
+    updateEventsOnMarkers();
 });
 
 
@@ -263,7 +304,7 @@ $('#search-input').keyup(function(){
                 listSearch += el.properties.nome;
                 listSearch += '</li>';
             document.getElementById('results').innerHTML += listSearch;
-            count = count + 1;
+            count++;
         }
     });
 });
@@ -341,22 +382,3 @@ function isBlank(str) {
     return (!str || /^\s*$/.test(str));
 }
 
-$(function() {
-  $('#list-markers li').hover(function() {
-      nome = $(this).text();
-      markersCluster.eachLayer(function (layer) {
-          if(layer.feature.properties.nome == nome){
-            iconUrl = setIconUrlByTypeSelected(layer.feature.properties.current_tipo);
-            layer.setIcon(new MarkerIcon({iconUrl: iconUrl}));
-          }
-      });
-
-  }, function() {
-        markersCluster.eachLayer(function (layer) {
-            if(layer.feature.properties.nome == nome){
-                iconUrl = setIconUrlByType(layer.feature.properties.current_tipo);
-                layer.setIcon(new MarkerIcon({iconUrl: iconUrl}));
-            }
-        });
-  });
-});

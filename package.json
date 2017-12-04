@@ -20,6 +20,6 @@
     "leaflet-basemaps": "^0.2.3",
     "leaflet-minimap": "^3.6.0",
     "leaflet-mouse-position": "^1.0.1",
-    "leaflet.markercluster": "^1.1.0",
+    "leaflet.markercluster": "^1.1.0"
   }
 }
