@@ -21,14 +21,6 @@ var streetsLayer = new L.TileLayer(mapboxUrl, {
         label: 'Satélite'
     });
 
-var streetsMinimap = new L.TileLayer(mapboxUrl, {
-    attribution: attrib,
-    id: 'mapbox.streets',
-    minZoom: 7,
-    maxZoom: 13 ,
-    accessToken: accessToken
-    });
-
 //Adicão do mapa
 var map = L.map('map', {
     center: [-5.1026, -42.8082],
@@ -45,13 +37,20 @@ map.on('contextmenu', function(e) {
 });
 
 //Minimapa
+var streetsMinimapLayer = new L.TileLayer(mapboxUrl, {
+    attribution: attrib,
+    id: 'mapbox.streets',
+    minZoom: 7,
+    maxZoom: 13 ,
+    accessToken: accessToken
+    });
 var miniMapOptions = {
     position: 'topright',
     toggleDisplay: true,
     width : 120,
     height : 120
 };
-var minimap = new L.Control.MiniMap(streetsMinimap, miniMapOptions).addTo(map);
+var minimap = new L.Control.MiniMap(streetsMinimapLayer, miniMapOptions).addTo(map);
 
 //Botões de Zoom
 var zoomHome = L.Control.zoomHome().addTo(map);
@@ -69,13 +68,8 @@ var baseLayers = {
 };
 var controlLayers = L.control.layers(baseLayers, null);
 
-var basemaps = [
-    streetsLayer,
-    satelliteStreetLayer
-];
-
 map.addControl(L.control.basemaps({
-    basemaps : basemaps,
+    basemaps : [streetsLayer, satelliteStreetLayer],
     tileX: 0,
     tileY: 0,
     tileZ: 1
@@ -86,13 +80,9 @@ var produtoresLayerToControl = L.featureGroup(),
 feirasLayerToControl = L.featureGroup(),
 comercioLayerToControl = L.featureGroup();
 
-controlLayers.addOverlay(produtoresLayerToControl, 'Produtores de Orgânicos');
-controlLayers.addOverlay(feirasLayerToControl, 'Feiras de Orgânicos');
-controlLayers.addOverlay(comercioLayerToControl, 'Comércio de Orgânicos');
-
-var produtores = L.layerGroup();
-var feiras = L.layerGroup();
-var comercio = L.layerGroup();
+var produtores = L.layerGroup(),
+    feiras = L.layerGroup(),
+    comercio = L.layerGroup();
 
 var jsonData;
 
@@ -101,12 +91,6 @@ var jsonData;
     addGeoJsonLayerWithClustering(data);
     jsonData = data;
 });*/
-
-
-$(".filter-button").click(function(){
-    $("#layers-type").toggle(400);
-});
-
 
 $.getJSON('data.geojson', function (data) {
     jsonData = data;
@@ -133,7 +117,6 @@ $.getJSON('data.geojson', function (data) {
     comercioLayerToControl.addTo(map);
     markersCluster.addTo(map);
 });
-
 
 //Marcadores
 var MarkerIcon = L.Icon.extend({
@@ -163,14 +146,11 @@ function bindPopup(feature, layer) {
     feature.layer = layer;
     props = feature.properties;
     if (props) {
-        var description = '<div class="row">';
-            description += '<div class="col-md-12"><strong>' + props.nome + '</strong><br/><br/></div>';
-            description += '</div>'; 
-
+        description = '<div><strong>' + props.nome + '</strong></div>'; 
         layer.bindPopup(description);
         layer.bindTooltip(props.nome).openTooltip();
     }
-
+    
     switch (props.current_tipo) {
         case 'Comercio':
             comercio.addLayer(layer);

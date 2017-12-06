@@ -1,11 +1,12 @@
 /*
   Autor: Ricardo Barbosa
-	Email: ricardobcm@outlook.com
+  Email: ricardobcm@outlook.com
 */
 
 :root {
 	--main-color : #7ABA7A;
 	--main-text-color : #FFF;
+  --popup-color : #7ABA7A;
 }
 
 html, body, .container-fluid {
@@ -267,4 +268,22 @@ footer {
     -o-transform: rotate(-135deg);
     transform: rotate(-135deg);
     opacity: 0.9;
+}
+
+/*Leaflet my styles*/
+.leaflet-popup-content-wrapper {
+  border-radius: 3px; 
+  box-shadow: 0 0 0 0;
+  border-color: var(--popup-color);
+  border-width: 1px;
+  border-style: solid;
+}
+
+.leaflet-popup-tip {
+  box-shadow: 0 0 0 0;
+  background-color: var(--popup-color);
+}
+
+.leaflet-container a.leaflet-popup-close-button {
+  color: var(--popup-color);
 }
