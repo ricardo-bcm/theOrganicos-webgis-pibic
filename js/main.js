@@ -48,7 +48,11 @@ var miniMapOptions = {
     position: 'topright',
     toggleDisplay: true,
     width : 120,
-    height : 120
+    height : 120,
+    strings: {
+        hideText: 'Esconder minimapa',
+        showText: 'Exibir minimapa'
+    }
 };
 var minimap = new L.Control.MiniMap(streetsMinimapLayer, miniMapOptions).addTo(map);
 
@@ -84,40 +88,6 @@ var produtores = L.layerGroup(),
     feiras = L.layerGroup(),
     comercio = L.layerGroup();
 
-var jsonData;
-
-//Add data geoJson
-/*$.getJSON('returnJsonOnly.php', function (data) {
-    addGeoJsonLayerWithClustering(data);
-    jsonData = data;
-});*/
-
-$.getJSON('data.geojson', function (data) {
-    jsonData = data;
-    geoJsonLayer = L.geoJson(data, {
-        pointToLayer: function (feature, latlng) { 
-            marker = null;  
-            switch(feature.properties.current_tipo) {
-                case 'Comercio' :
-                    marker = L.marker(latlng, {icon: new MarkerIcon({iconUrl: comercioMarkerUrl})});
-                    break;
-                case 'Produtor' :
-                    marker = L.marker(latlng, {icon: new MarkerIcon({iconUrl: produtorMarkerUrl})});
-                    break;
-                case 'Feira' :
-                    marker = L.marker(latlng, {icon: new MarkerIcon({iconUrl: feiraMarkerUrl})});
-                    break;
-            }
-            return marker;
-        },
-        onEachFeature: bindPopup
-    });
-    produtoresLayerToControl.addTo(map);
-    feirasLayerToControl.addTo(map);
-    comercioLayerToControl.addTo(map);
-    markersCluster.addTo(map);
-});
-
 //Marcadores
 var MarkerIcon = L.Icon.extend({
     options: {
@@ -135,12 +105,39 @@ var comercioMarkerUrl = 'img/comercio-marker.png',
     produtorMarkerUrlSelected = 'img/produtor-marker-selected.png',
     feiraMarkerUrlSelected = 'img/feira-marker-selected.png';
 
-//Agrupador de marcadores
-var markersCluster = L.markerClusterGroup({
-        disableClusteringAtZoom: 13,
-        showCoverageOnHover: true,
-        spiderfyOnMaxZoom: false
+var jsonData;
+
+//Add data geoJson
+/*$.getJSON('returnJsonOnly.php', function (data) {
+    addGeoJsonLayerWithClustering(data);
+    jsonData = data;
+});*/
+
+$.getJSON('data.geojson', function (data) {
+    jsonData = data;
+    geoJsonLayer = L.geoJson(data, {
+        pointToLayer: function (feature, latlng) { 
+            marker = null;  
+            switch(feature.properties.current_tipo) {
+                case 'Comercio' :
+                    marker = L.marker(latlng, {icon: new MarkerIcon({iconUrl: comercioMarkerUrl}),title: feature.properties.nome});
+                    break;
+                case 'Produtor' :
+                    marker = L.marker(latlng, {icon: new MarkerIcon({iconUrl: produtorMarkerUrl}),title: feature.properties.nome});
+                    break;
+                case 'Feira' :
+                    marker = L.marker(latlng, {icon: new MarkerIcon({iconUrl: feiraMarkerUrl}),title: feature.properties.nome});
+                    break;
+            }
+            return marker;
+        },
+        onEachFeature: bindPopup
     });
+    produtoresLayerToControl.addTo(map);
+    feirasLayerToControl.addTo(map);
+    comercioLayerToControl.addTo(map);
+    markersCluster.addTo(map);
+});
 
 function bindPopup(feature, layer) {
     feature.layer = layer;
@@ -148,7 +145,7 @@ function bindPopup(feature, layer) {
     if (props) {
         description = '<div><strong>' + props.nome + '</strong></div>'; 
         layer.bindPopup(description);
-        layer.bindTooltip(props.nome).openTooltip();
+        // layer.bindTooltip(props.nome).openTooltip();
     }
     
     switch (props.current_tipo) {
@@ -163,6 +160,13 @@ function bindPopup(feature, layer) {
             break;
     }
 } 
+
+//Agrupador de marcadores
+var markersCluster = L.markerClusterGroup({
+        disableClusteringAtZoom: 13,
+        showCoverageOnHover: true,
+        spiderfyOnMaxZoom: false
+    });
 
 
 function sycronizeListMarkers() {
@@ -350,9 +354,7 @@ function moveToPoint(name,) {
 function openPopUp(name) {
     markersCluster.eachLayer(function (layer) {
         if(layer.feature.properties.nome == name){
-            var desc = '<div class="row">';
-                desc += '<div class="col-md-12"><strong>' + name + '</strong><br/><br/></div>';
-                desc += '</div>';
+            var desc = '<div><strong>' + name + '</strong><br/><br/></div>';
             layer.bindPopup(desc).openPopup();
         }
     });
@@ -361,4 +363,3 @@ function openPopUp(name) {
 function isBlank(str) {
     return (!str || /^\s*$/.test(str));
 }
-

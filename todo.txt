@@ -1,3 +1,4 @@
 - Mostrar "Nenhum Resultado" na busca
 - Feedback hover navbar buttons
 - Diminuir alpha dos marcadores
+- Colocar lista de pontos em ordem alfabética
