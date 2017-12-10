@@ -11,9 +11,11 @@
     	<link rel="icon" href="img/logo16x16.png" sizes="16x16">
     	<link rel="icon" href="img/logo32x32.png" sizes="32x32">
     	<link rel="icon" href="img/logo96x96.png" sizes="96x96">
+    	<link rel="prefetch" href="css/fonts/manteka.otf" as="font">
 		<link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css">
 		<link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css"/>
 		<link rel="stylesheet" href="node_modules/leaflet/dist/leaflet.css"/>
+		<link rel="stylesheet" href="node_modules/leaflet-minimap/dist/Control.MiniMap.min.css">
 	    <link rel="stylesheet" href="css/main.css">
 	</head>
 <body>
@@ -45,9 +47,9 @@
 
 	<section class="container-fluid">
 		 <div class="row">	
-		 	<div class="col-md-3">
+		 	<section class="col-md-3">
 			 	<div class="row">
-			 		<div id="information-wrapper" class="d-flex flex-column">
+			 		<div id="information-wrapper" class="d-flex flex-column flex-nowrap">
 					 	<div id="search-div">
 							<div class="input-group input-group-to-style">
 								<input type="search" class="form-control" id="search-input" placeholder="Buscar..." onclick="select()"/>
@@ -55,36 +57,36 @@
 							</div>
 							<ul class="list-group" id="results"></ul>
 						</div>
+						<span id="select-layers-label" class="d-none d-sm-block">Filtro</span>
 						<div id="layers-type" class="d-none d-sm-block">
 		                        Produtor de orgânicos
-		                        <div class="material-switch pull-right">
+		                        <div class="material-switch pull-right"><span id="totalProdutores"></span>
 		                            <input id="switch-produtor" type="checkbox" checked />
 		                            <label for="switch-produtor" class="switch-prod-label"></label>
 		                        </div> <br><br>
 		                        Comércio parceiro de orgânicos
-		                        <div class="material-switch pull-right">
+		                        <div class="material-switch pull-right"><span id="totalComercios"></span>
 		                            <input id="switch-comercio" type="checkbox" checked/>
 		                            <label for="switch-comercio" class="switch-com-label"></label>
 		                        </div><br><br>
 		                        Feira de orgânicos
-		                        <div class="material-switch pull-right">
+		                        <div class="material-switch pull-right"><span id="totalFeiras"></span>
 		                            <input id="switch-feira" type="checkbox" checked/>
 		                            <label for="switch-feira" class="switch-feira-label"></label>
 		                        </div>
 		                </div>
-		                <div id="divider" class="d-none d-sm-block"><p>Localizações</p></div>
+		                <span id="locais-label" class="d-none d-sm-block">Locais</span>
 						<ul class="list-group d-none d-sm-block" id="list-markers"></ul>
 					</div>
 				</div>
-		 	</div>
-		 	<div class="col-md-9">
+		 	</section>
+		 	<section class="col-md-9">
 		 		<div id="map"></div>
-		 	</div>
+		 	</section>
 		 </div>
 	</section>
 
     <link rel="stylesheet" href="node_modules/leaflet-basemaps/L.Control.Basemaps.css"/>
-    <link rel="stylesheet" href="node_modules/leaflet-minimap/dist/Control.MiniMap.min.css">
     <link rel="stylesheet" href="node_modules/leaflet.markercluster/dist/MarkerCluster.css"/>
     <link rel="stylesheet" href="node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css"/>
     <link rel="stylesheet" href="node_modules/leaflet-mouse-position/src/L.Control.MousePosition.css"/>

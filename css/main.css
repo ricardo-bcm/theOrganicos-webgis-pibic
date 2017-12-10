@@ -2,32 +2,38 @@
   Autor: Ricardo Barbosa
   Email: ricardobcm@outlook.com
 */
-
 :root {
 	--main-color : #7ABA7A;
 	--main-text-color : #FFF;
-  --popup-color : #7ABA7A;
+  --popup-color : #999;
 }
 
 html, body, .container-fluid {
 	height: 100%;
 }
 
+@font-face {
+  font-family:'Manteka';
+  src:url('fonts/manteka.otf');
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
 	padding: 0;
 	margin: 0;
-	max-height: calc(100% - 121px);
+	max-height: calc(100% - 104px);
 }		
 
 /*Navbar*/
 .navbar {
 	width:100%;
   background-color: var(--main-color);
+  padding: 0 10px 0 0;
 }
 
 #title-navbar {
 	color: var(--main-text-color);
-	font-weight: bolder;
 }
 
 .navbar-text {
@@ -38,13 +44,13 @@ body {
 .navbar-brand {
 	padding:0;
 	margin: 0;
-	margin-right: 20px;
 }
 
 #nav-text-link {
 	color: var(--main-text-color);
-	font-size: x-large;
+	font-size: smaller;
 	text-align: right;
+  font-family: 'Manteka';
 }
 
 /*Colunas*/
@@ -64,14 +70,13 @@ body {
 }
 
 .col-md-3 {
-	padding-left: 18px;
+	padding-left: 15px;
 }
 
 #information-wrapper {
 	width: 100%;
 	padding: 3px;
-	border-radius: 3px;
-	background-color: #F1F1F1;
+	background-color: var(--main-color);
 }
 
 /*Busca*/
@@ -83,13 +88,12 @@ body {
 	position: absolute;
 	width: 89%;
 	z-index: 1001;
-    -webkit-box-shadow: 20px 4px 9px  rgba(0,0,0,.25);
-   	   -moz-box-shadow: 20px 4px 9px  rgba(0,0,0,.25);
+  -webkit-box-shadow: 20px 4px 9px  rgba(0,0,0,.25);
+     -moz-box-shadow: 20px 4px 9px  rgba(0,0,0,.25);
    		    box-shadow: 20px 4px 9px  rgba(0,0,0,.25);
 }
 
 #layers-type {
-	margin-top: 5px;
 	padding: 10px;
   border: 1px solid #CED4DA;
 	border-radius: 5px;
@@ -98,22 +102,29 @@ body {
 }
 
 #list-markers {
-	height: 65%;
 	width: 100%;
 	overflow-y: scroll;
 	overflow-x: hidden;
+  bottom: 0;
 }
 
-#divider {
-	background-color: #F1F1F1;
-	text-align: center;
-	margin: 0;
-	padding: 5px;
-}
+/*.line-divider {
+  height: 1px;
+  background-color: #fff;
+  width: 100%;
+  margin-bottom: 10px;
+}*/
 
-.link-class:hover{
+.link-class:hover {
 	background-color: #F1F1F1;
 	cursor: pointer;
+}
+
+#nav-text-link:hover {
+  background-color: #fff;
+  color: var(--main-color);
+  border-radius: 5px;
+  transition-duration: 0.3s;
 }
 
 .list-group-item {
@@ -160,10 +171,10 @@ footer {
 .material-switch > label::before {
     background: rgb(0, 0, 0);
     box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.5);
-    border-radius: 5px;
+    border-radius: 4px;
     content: '';
     height: 16px;
-    margin-top: -8px;
+    margin-top: -4px;
     position:absolute;
     opacity: 0.3;
     transition: all 0.2s ease-in-out;
@@ -171,24 +182,24 @@ footer {
 }
 .material-switch > label::after {
     background: rgb(255, 255, 255);
-    border-radius: 5px;
+    border-radius: 3px;
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
     content: '';
-    height: 24px;
-    left: -4px;
-    margin-top: -8px;
+    height: 18px;
+    left: -2px;
+    margin-top: -7px;
     position: absolute;
-    top: -4px;
+    top: 2px;
     transition: all 0.2s ease-in-out;
-    width: 24px;
+    width: 20px;
 }
 .material-switch > input[type="checkbox"]:checked + label::before {
-    background: inherit;
-    opacity: 0.5;
+    /*background: inherit;
+    opacity: 0.6;*/
 }
 .material-switch > input[type="checkbox"]:checked + label::after {
     background: inherit;
-    left: 20px;
+    left: 25px;
 }
 
 .switch-feira-label {
@@ -210,38 +221,37 @@ footer {
 }
 
 .navbar-toggler span {
-   display: block;
-   background-color: #444;
-   height: 3px;
-   width: 25px;
-   margin-top: 4px;
-   margin-bottom: 4px;
-   -webkit-transform: rotate(0deg);
-   -moz-transform: rotate(0deg);
-   -o-transform: rotate(0deg);
-   transform: rotate(0deg);
-   position: relative;
-   left: 0;
-   opacity: 1;
+  display: block;
+  background-color: #444;
+  height: 3px;
+  width: 25px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  position: relative;
+  left: 0;
+  opacity: 1;
+  -webkit-transform: rotate(0deg);
+     -moz-transform: rotate(0deg);
+       -o-transform: rotate(0deg);
+          transform: rotate(0deg);
 }
 
 .navbar-toggler span:nth-child(1),
 .navbar-toggler span:nth-child(3) {
-   -webkit-transition: transform .35s ease-in-out;
-   -moz-transition: transform .35s ease-in-out;
-   -o-transition: transform .35s ease-in-out;
-   transition: transform .35s ease-in-out;
+  -webkit-transition: transform .35s ease-in-out;
+     -moz-transition: transform .35s ease-in-out;
+       -o-transition: transform .35s ease-in-out;
+          transition: transform .35s ease-in-out;
 }
 
 .navbar-toggler:not(.collapsed) span:nth-child(1) {
     position: relative;
-    left:2px;
     top: 10px;
-    -webkit-transform: rotate(135deg);
-    -moz-transform: rotate(135deg);
-    -o-transform: rotate(135deg);
-    transform: rotate(135deg);
     opacity: 0.9;
+    -webkit-transform: rotate(135deg);
+       -moz-transform: rotate(135deg);
+         -o-transform: rotate(135deg);
+            transform: rotate(135deg);
 }
 
 .navbar-toggler:not(.collapsed) span:nth-child(2) {
@@ -252,13 +262,12 @@ footer {
 
 .navbar-toggler:not(.collapsed) span:nth-child(3) {
     position: relative;
-    left: 2px;
     top: -12px;
-    -webkit-transform: rotate(-135deg);
-    -moz-transform: rotate(-135deg);
-    -o-transform: rotate(-135deg);
-    transform: rotate(-135deg);
     opacity: 0.9;
+    -webkit-transform: rotate(-135deg);
+       -moz-transform: rotate(-135deg);
+         -o-transform: rotate(-135deg);
+            transform: rotate(-135deg);
 }
 
 /*Leaflet my styles*/
@@ -298,40 +307,69 @@ a.leaflet-control-zoomhome-home {
 
 .leaflet-control-minimap.leaflet-container.leaflet-touch.leaflet-fade-anim.leaflet-grab.leaflet-touch-drag.leaflet-touch-zoom.leaflet-control {
   border: 1px solid #fff;
-  box-shadow: 4px 3px 9px rgba(0,0,0,.65); 
+  -webkit-box-shadow: 4px 3px 9px rgba(0,0,0,.65); 
+     -moz-box-shadow: 4px 3px 9px rgba(0,0,0,.65); 
+          box-shadow: 4px 3px 9px rgba(0,0,0,.65); 
+}
+
+.leaflet-control-minimap {
+  border: 1px solid #fff;
+  -webkit-box-shadow: 4px 3px 9px rgba(0,0,0,.65); 
+     -moz-box-shadow: 4px 3px 9px rgba(0,0,0,.65); 
+          box-shadow: 4px 3px 9px rgba(0,0,0,.65); 
 }
 
 .basemap.alt img  {
   border: 1px solid #fff;
   border-radius: 3px;
-  box-shadow: 3px 5px 5px rgba(0,0,0,.65);  
   margin-right: -5px;
+  -webkit-box-shadow: 3px 5px 5px rgba(0,0,0,.65); 
+     -moz-box-shadow: 3px 5px 5px rgba(0,0,0,.65); 
+          box-shadow: 3px 5px 5px rgba(0,0,0,.65);  
 }
-
 
 @media (min-width: 576px) {
   body {
     padding: 0;
     margin: 0;
-    max-height: calc(100% - 82px);
+    max-height: calc(100% - 66px);
   } 
 
   .navbar {
-    width:100%;
-    background-color: var(--main-color);
-    width:100%;
     margin-bottom: 3px;
   }
 
-  .col-md-9{
-    height: 100%;
+  #nav-text-link {
+    font-size: large;
+  }
+
+  .col-md-9 {
     padding: 0 3px 0 3px;
   }
 
-  #information-wrapper {
-    width: 100%;
-    padding: 5px;
-    border-radius: 3px;
-    background-color: #F1F1F1;
+  .col-md-3 {
+    padding-left: 18px;
   }
+
+  #information-wrapper {
+    padding: 5px;
+    border-radius: 0;
+    margin: -5px 0 0 0;
+    background-color: var(--main-color);
+  }
+
+  #locais-label {
+    text-align: center;
+    font-family: 'Manteka';
+    color: #fff;
+    margin: 10px 0 0 0;
+  }
+
+  #select-layers-label {
+    text-align: center;
+    font-family: 'Manteka';
+    color: #fff;
+    margin: 10px 0 0 0;
+  }
+
 }

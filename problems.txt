@@ -1,0 +1,2 @@
+- Bug na listagem no Firefox e Edge
+- Precisa do Height automático

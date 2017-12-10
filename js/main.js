@@ -113,6 +113,10 @@ var jsonData;
     jsonData = data;
 });*/
 
+var nComercio = 0,
+    nFeira = 0,
+    nProdutor = 0;
+
 $.getJSON('data.geojson', function (data) {
     jsonData = data;
     geoJsonLayer = L.geoJson(data, {
@@ -121,18 +125,24 @@ $.getJSON('data.geojson', function (data) {
             switch(feature.properties.current_tipo) {
                 case 'Comercio' :
                     marker = L.marker(latlng, {icon: new MarkerIcon({iconUrl: comercioMarkerUrl}),title: feature.properties.nome});
+                    nComercio += 1;
                     break;
                 case 'Produtor' :
                     marker = L.marker(latlng, {icon: new MarkerIcon({iconUrl: produtorMarkerUrl}),title: feature.properties.nome});
+                    nProdutor += 1;
                     break;
                 case 'Feira' :
                     marker = L.marker(latlng, {icon: new MarkerIcon({iconUrl: feiraMarkerUrl}),title: feature.properties.nome});
+                    nFeira += 1;
                     break;
             }
             return marker;
         },
         onEachFeature: bindPopup
     });
+    document.getElementById('totalProdutores').innerHTML = '(' + nProdutor + ')';
+    document.getElementById('totalComercios').innerHTML = '(' + nComercio + ')';
+    document.getElementById('totalFeiras').innerHTML = '(' + nFeira + ')';
     produtoresLayerToControl.addTo(map);
     feirasLayerToControl.addTo(map);
     comercioLayerToControl.addTo(map);
@@ -168,15 +178,19 @@ var markersCluster = L.markerClusterGroup({
         spiderfyOnMaxZoom: false
     });
 
-
 function sycronizeListMarkers() {
     document.getElementById('list-markers').innerHTML = '';
     var linePoint = '';
+    var markerNames = [];
     markersCluster.eachLayer(function (layer) {
-        linePoint += '<li class="list-group-item list-group-item-action">';
-        linePoint += layer.feature.properties.nome;
-        linePoint += '</li>';
+        markerNames.push(layer.feature.properties.nome);
     });
+    markerNames.sort();
+    for (var i = 0; i < markerNames.length; i++) {
+        linePoint += '<li class="list-group-item list-group-item-action">';
+        linePoint += markerNames[i];
+        linePoint += '</li>';
+    }
     $('#list-markers').append(linePoint);
 }
 
