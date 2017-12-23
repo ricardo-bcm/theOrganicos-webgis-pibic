@@ -1,104 +1,105 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 	<head>
 		<title>TheOrgânicos - Sistema de Informação Geográfica de Alimentos Orgânicos e Agroecológicos de Teresina</title>
 		
 		<meta charset="utf-8">
-    	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    	<meta name="description" content="Sistema de Informação Geográfica de Alimentos Orgânicos e Agroecológicos de Teresina">
+		<meta name="description" content="Sistema de Informação Geográfica de Alimentos Orgânicos e Agroecológicos de Teresina">
 
-    	<link rel="icon" href="img/logo16x16.png" sizes="16x16">
-    	<link rel="icon" href="img/logo32x32.png" sizes="32x32">
-    	<link rel="icon" href="img/logo96x96.png" sizes="96x96">
-    	<link rel="prefetch" href="css/fonts/manteka.otf" as="font">
+		<link rel="icon" href="asset/img/logo16x16.png" sizes="16x16">
+		<link rel="icon" href="asset/img/logo32x32.png" sizes="32x32">
+		<link rel="icon" href="asset/img/logo96x96.png" sizes="96x96">
+		<link rel="prefetch" href="assets/css/fonts/manteka.otf">
 		<link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css">
 		<link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css"/>
 		<link rel="stylesheet" href="node_modules/leaflet/dist/leaflet.css"/>
 		<link rel="stylesheet" href="node_modules/leaflet-minimap/dist/Control.MiniMap.min.css">
-	    <link rel="stylesheet" href="css/main.css">
+		<link rel="stylesheet" href="assets/css/main.min.css">
 	</head>
-<body>
 
+<body>
 	<nav class="navbar navbar-expand-md">
 		<a class="navbar-brand" id="title-navbar" href="#">
-			<img src="img/logo.png" height="60" width="60" alt="">
+			<img src="assets/img/logo.png" height="60" width="60" alt="">
 			TheOrgânicos
 		</a>
 		<button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-		  	<span> </span>
-		    <span> </span>
-		    <span> </span>
+				<span> </span>
+				<span> </span>
+				<span> </span>
 		</button>
 		<div class="collapse navbar-collapse" id="navbarCollapse" >
-		 	<ul class="navbar-nav ml-auto">
-		    	<li class="nav-item">
-					<a class="nav-link" id="nav-text-link" href="#">Sobre</a>
+			<ul class="navbar-nav ml-auto">
+				<li class="nav-item">
+					<a class="nav-link nav-text-link" href="#">Sobre</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" id="nav-text-link" href="#">Contato</a>
+					<a class="nav-link nav-text-link" href="#">Contato</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" id="nav-text-link" href="#">Equipe</a>
+					<a class="nav-link nav-text-link" href="#">Equipe</a>
 				</li>
 			</ul>
 		</div>
-	</nav>	
+	</nav>
 
-	<section class="container-fluid">
-		 <div class="row">	
-		 	<section class="col-md-3">
-			 	<div class="row">
-			 		<div id="information-wrapper" class="d-flex flex-column flex-nowrap">
-					 	<div id="search-div">
+	<div class="container-fluid">
+		<div class="row">	
+			<div class="col-md-3">
+				<div class="row">
+					<div id="information-wrapper" class="d-flex flex-column flex-nowrap">
+						<div id="search-div">
 							<div class="input-group input-group-to-style">
 								<input type="search" class="form-control" id="search-input" placeholder="Buscar..." onclick="select()"/>
 								<span class="input-group-addon"><i class="fa fa-search"></i></span>
 							</div>
-							<ul class="list-group" id="results"></ul>
-						</div>
+							<ul class="list-group" id="search-results"></ul>
+						</div><!-- search-div -->
 						<span id="select-layers-label" class="d-none d-sm-block">Filtro</span>
 						<div id="layers-type" class="d-none d-sm-block">
-		                        Produtor de orgânicos
-		                        <div class="material-switch pull-right"><span id="totalProdutores"></span>
-		                            <input id="switch-produtor" type="checkbox" checked />
-		                            <label for="switch-produtor" class="switch-prod-label"></label>
-		                        </div> <br><br>
-		                        Comércio parceiro de orgânicos
-		                        <div class="material-switch pull-right"><span id="totalComercios"></span>
-		                            <input id="switch-comercio" type="checkbox" checked/>
-		                            <label for="switch-comercio" class="switch-com-label"></label>
-		                        </div><br><br>
-		                        Feira de orgânicos
-		                        <div class="material-switch pull-right"><span id="totalFeiras"></span>
-		                            <input id="switch-feira" type="checkbox" checked/>
-		                            <label for="switch-feira" class="switch-feira-label"></label>
-		                        </div>
-		                </div>
-		                <span id="locais-label" class="d-none d-sm-block">Locais</span>
+							Produtor de orgânicos
+							<div class="material-switch pull-right"><span id="totalProdutores"></span>
+								<input id="switch-produtor" type="checkbox" checked />
+								<label for="switch-produtor" id="switch-prod-label"></label>
+							</div> <br><br>
+							Comércio parceiro de orgânicos
+							<div class="material-switch pull-right"><span id="totalComercios"></span>
+								<input id="switch-comercio" type="checkbox" checked/>
+								<label for="switch-comercio" id="switch-com-label"></label>
+							</div><br><br>
+							Feira de orgânicos
+							<div class="material-switch pull-right"><span id="totalFeiras"></span>
+								<input id="switch-feira" type="checkbox" checked/>
+								<label for="switch-feira" id="switch-feira-label"></label>
+							</div>
+						</div> <!-- layers-type -->
+						<span id="locais-label" class="d-none d-sm-block">Locais</span>
 						<ul class="list-group d-none d-sm-block" id="list-markers"></ul>
-					</div>
-				</div>
-		 	</section>
-		 	<section class="col-md-9">
+					</div> <!-- information-wrapper -->
+				</div> <!-- row -->
+		 	</div> <!-- col-md-3 -->
+		 	<div class="col-md-9">
 		 		<div id="map"></div>
-		 	</section>
-		 </div>
-	</section>
+		 	</div>
+		 </div> <!-- row -->
+	</div> <!-- container-fluid -->
 
-    <link rel="stylesheet" href="node_modules/leaflet-basemaps/L.Control.Basemaps.css"/>
-    <link rel="stylesheet" href="node_modules/leaflet.markercluster/dist/MarkerCluster.css"/>
-    <link rel="stylesheet" href="node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css"/>
-    <link rel="stylesheet" href="node_modules/leaflet-mouse-position/src/L.Control.MousePosition.css"/>
+	<link rel="stylesheet" href="node_modules/leaflet-basemaps/L.Control.Basemaps.css"/>
+	<link rel="stylesheet" href="node_modules/leaflet.markercluster/dist/MarkerCluster.css"/>
+	<link rel="stylesheet" href="node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css"/>
+	<link rel="stylesheet" href="node_modules/leaflet-mouse-position/src/L.Control.MousePosition.css"/>
 	<link rel="stylesheet" href="libs/leaflet.zoomhome/dist/leaflet.zoomhome.css"/>
 	<script src="node_modules/leaflet/dist/leaflet.js"></script>
-    <script src="node_modules/jquery/dist/jquery.min.js"></script>
-    <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="node_modules/leaflet-basemaps/L.Control.Basemaps-min.js"></script>
-    <script src="node_modules/leaflet-minimap/dist/Control.MiniMap.min.js"></script>
+	<script src="node_modules/jquery/dist/jquery.min.js"></script>
+	<script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="node_modules/leaflet-basemaps/L.Control.Basemaps-min.js"></script>
+	<script src="node_modules/leaflet-minimap/dist/Control.MiniMap.min.js"></script>
 	<script src="node_modules/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
-    <script src="node_modules/leaflet-mouse-position/src/L.Control.MousePosition.js"></script>
-    <script src="libs/leaflet.zoomhome/dist/leaflet.zoomhome.min.js"></script>
-	<script src="js/main.js"></script>
+	<script src="node_modules/leaflet-mouse-position/src/L.Control.MousePosition.js"></script>
+	<script src="libs/leaflet.zoomhome/dist/leaflet.zoomhome.min.js"></script>
+	<script src="assets/js/main.js"></script>
 </body>
 </html>
