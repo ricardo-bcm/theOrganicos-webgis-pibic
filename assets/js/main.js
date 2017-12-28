@@ -4,7 +4,6 @@
 */
 /*jshint esversion: 6 */
 var
-jsonData,
 mapboxUrl = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}',
 accessToken = 'pk.eyJ1IjoicmljYXJkb2JjbSIsImEiOiJjajlrMTJkejQxaTUyMzNwZ3cxcnM3MDU2In0.pr0XFTVGiylyl6Sth57t9g',
 attrib = '<a href="http://openstreetmap.org">OpenStreetMap</a> | <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a> | <a href="http://mapbox.com">Mapbox</a>',
@@ -87,6 +86,7 @@ northWest = L.latLng( -4.904886794837085, -43.18674087524414 ),
 southEast = L.latLng( -5.332669664718695, -42.37615585327149 ),
 bounds = L.latLngBounds( northWest, southEast );
 map.setMaxBounds( bounds ),
+
 //Layers para controlar a inserção/remoção dos layers no cluster
 produtoresLayerToControl = L.featureGroup(),
 feirasLayerToControl = L.featureGroup(),
@@ -94,28 +94,29 @@ comercioLayerToControl = L.featureGroup(),
 produtoresLayer = L.layerGroup(),
 feirasLayer = L.layerGroup(),
 comercioLayer = L.layerGroup(),
+
 //Icones para os marcadores
 MarkerIcon = L.Icon.extend({
 	options: {
-		shadowUrl: 'assets/img/shadow.png',
-		iconSize: [84, 71],
+		shadowUrl: 'assets/images/shadow.png',
+		iconSize: [54, 71],
 		iconAnchor: [29, 63],
-		popupAnchor: [3, -61]
+		popupAnchor: [-2, -61]
 	}
 }),
-comercioMarkerIcon = new MarkerIcon({ iconUrl: 'assets/img/comercio-marker.png' }),
-feiraMarkerIcon = new MarkerIcon({ iconUrl: 'assets/img/feira-marker.png' }),
-produtorMarkerIcon = new MarkerIcon({ iconUrl: 'assets/img/produtor-marker.png' }),
-comercioMarkerIconSelected = new MarkerIcon({ iconUrl: 'assets/img/comercio-marker-selected.png' }),
-feiraMarkerIconSelected = new MarkerIcon({ iconUrl: 'assets/img/feira-marker-selected.png' }),
-produtorMarkerIconSelected = new MarkerIcon({ iconUrl: 'assets/img/produtor-marker-selected.png' }),
+comercioMarkerIcon = new MarkerIcon({ iconUrl: 'assets/images/comercio-marker.png' }),
+feiraMarkerIcon = new MarkerIcon({ iconUrl: 'assets/images/feira-marker.png' }),
+produtorMarkerIcon = new MarkerIcon({ iconUrl: 'assets/images/produtor-marker.png' }),
+comercioMarkerIconSelected = new MarkerIcon({ iconUrl: 'assets/images/comercio-marker-selected.png' }),
+feiraMarkerIconSelected = new MarkerIcon({ iconUrl: 'assets/images/feira-marker-selected.png' }),
+produtorMarkerIconSelected = new MarkerIcon({ iconUrl: 'assets/images/produtor-marker-selected.png' }),
+
 // Contadores
 comerciosTotal = 0,
 feirasTotal = 0,
 produtoresTotal = 0; /*jshint ignore:line*/
 
 $.getJSON('data.geojson', function( data ) {
-	jsonData = data;
 	var geoJsonLayer = L.geoJson( data, {
 		pointToLayer: function( feature, latlng ) {
 			switch (feature.properties.current_tipo) {
@@ -190,12 +191,9 @@ markersCluster = L.markerClusterGroup({
 function sycronizeListMarkers() {
 	var
 	linePoint = '',
-	markerNames = [];
+	markerNames = sortList(markersCluster);
 	document.getElementById('list-markers').innerHTML = '';
-	markersCluster.eachLayer(function ( layer ) {
-		markerNames.push( layer.feature.properties.nome );
-	});
-	markerNames.sort();
+
 	for ( var i = 0, markerName; markerName = markerNames[i]; i++ ) {/*jshint ignore:line*/
 		linePoint += '<li class="list-group-item list-group-item-action">';
 		linePoint += markerName;
@@ -208,7 +206,7 @@ function updateEventsOnMarkers() {
 	var nome = null;
 	$('#list-markers li').click(function () {
 		nome = $(this).text();
-		moveToPoint( nome );
+		moveToPoint( markersCluster, nome );
 	});
 
 	$('#list-markers li').hover(function () {
@@ -291,13 +289,16 @@ $('#search-input').keyup(function(){
 	searchField = $('#search-input').val(),
 	regex = new RegExp( searchField, "i" ),
 	count = 0;
-	document.getElementById('search-results').innerHTML = '';
-	$.each( jsonData.features,function ( index, element ) {
-		if ( element.properties.nome.search(regex) != -1 && searchField && count < 5 ){
+	if (searchField === '') {
+		document.getElementById('search-results').innerHTML = '';
+		return;
+	}
+	markersCluster.eachLayer(function ( layer ) {
+		if ( layer.feature.properties.nome.search(regex) != -1 && searchField && count < 5 ){
 			var
 			listSearch = '';
 			listSearch += '<li class="list-group-item link-class">';
-			listSearch += element.properties.nome;
+			listSearch += layer.feature.properties.nome;
 			listSearch += '</li>';
 			document.getElementById('search-results').innerHTML += listSearch;
 			count++;
@@ -310,7 +311,7 @@ $('#search-results').on('click', 'li', function() {
 	click_txt = $(this).text().split('|'),
 	inputValue = $.trim(click_txt[0]);
 	$('#search-input').val( inputValue );
-	moveToPoint( inputValue );
+	moveToPoint( markersCluster, inputValue );
 	document.getElementById('search-results').innerHTML = '';
 });
 
@@ -332,7 +333,7 @@ function getIconByType( tipo ) {
 
 function getSelectedIconByType( tipo ) {
 	var icon = null;
-	switch(tipo) {
+	switch( tipo ) {
 		case 'Comercio':
 			icon = comercioMarkerIconSelected;
 			break;
@@ -346,13 +347,13 @@ function getSelectedIconByType( tipo ) {
 	return icon;
 }
 
-function moveToPoint( name ) {
+function moveToPoint( layerToSearch, name ) {
 	var //Variável evita mais de uma chamada ao 'zoomend' por vez 
 	controle = 0,
 	latlng;
-	$.each( jsonData.features, function( index, element ) {
-		if ( element.properties.nome == name ){
-			latlng = L.latLng(element.geometry.coordinates[1], element.geometry.coordinates[0]);
+	layerToSearch.eachLayer(function ( layer ) {
+		if ( layer.feature.properties.nome == name ){
+			latlng = L.latLng( layer.feature.geometry.coordinates[1], layer.feature.geometry.coordinates[0] );
 			map.flyTo( latlng,14 );
 			map.on('zoomend', function( e ) {
 				if ( controle == 0 ) {
@@ -372,4 +373,12 @@ function openPopUp( name ) {
 			layer.bindPopup( desc ).openPopup();
 		}
 	});
+}
+
+function sortList( layer ) {
+	var arrayTemp = [];
+	layer.eachLayer(function ( layer ) {
+		arrayTemp.push( layer.feature.properties.nome );
+	});
+	return arrayTemp.sort();
 }

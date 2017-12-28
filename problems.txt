@@ -1,3 +1,0 @@
-- Bug na listagem no Firefox e Edge
-- Precisa do Height automático
-- Buscar apenas nos marcadores visíveis
