@@ -1,11 +1,12 @@
 module.exports = function(grunt) {
 	'use strict';
+	require("load-grunt-tasks")(grunt);
 
 	var gruntConfig = {
 		pkg: grunt.file.readJSON('package.json'),
 		realFavicon: {
 			favicons: {
-				src: 'src/logo.png',
+				src: 'logo/logo.png',
 				dest: 'assets/images/icons',
 				options: {
 					iconsPath: 'assets/images/icons',
@@ -64,25 +65,38 @@ module.exports = function(grunt) {
 				}
 			}
 		},
+		"babel": {
+		  options: {
+		    sourceMap: true
+		  },
+		  dist: {
+		    files: {
+		      "assets/dist/js/main.js": "assets/src/js/main.js"
+		    }
+		  }
+		},
 		uglify: {
 			options: {
 				mangle: false
 			},  
 			js: {
 				files: {
-					'assets/js/main.min.js' : ['assets/js/main.js']
+					'assets/dist/js/main.min.js' : ['assets/dist/js/main.js']
 				}
 			}
 		},
 		cssmin: {
 			css: {
 				files: {
-					'assets/css/main.min.css' : 'assets/css/main.css'
+					'assets/dist/css/main.min.css' : 'assets/src/css/main.css'
 				}
 			}
 		},
 		jshint: {
-			src: ['assets/js/main.js']
+			src: ['assets/src/js/main.js'],
+			options: {
+        esversion: 6
+			}
 		}
 	};
 
@@ -96,5 +110,5 @@ module.exports = function(grunt) {
 
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 
-	grunt.registerTask('default', ['realFavicon', 'uglify', 'cssmin', 'jshint']);
+	grunt.registerTask('default', [/*'realFavicon',*/ 'babel' , 'uglify', 'cssmin', 'jshint']);
 };

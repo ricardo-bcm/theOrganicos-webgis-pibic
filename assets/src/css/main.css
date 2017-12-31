@@ -14,7 +14,7 @@ html, body, .container-fluid {
 
 @font-face {
 	font-family:'Manteka';
-	src:url('fonts/manteka.otf');
+	src:url('../../fonts/manteka.otf');
 	font-weight: normal;
 	font-style: normal;
 }

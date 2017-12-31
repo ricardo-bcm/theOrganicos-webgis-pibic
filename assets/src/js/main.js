@@ -3,7 +3,7 @@
 	Email: ricardobcm@outlook.com
 */
 /*jshint esversion: 6 */
-var
+let
 mapboxUrl = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}',
 accessToken = 'pk.eyJ1IjoicmljYXJkb2JjbSIsImEiOiJjajlrMTJkejQxaTUyMzNwZ3cxcnM3MDU2In0.pr0XFTVGiylyl6Sth57t9g',
 attrib = '<a href="http://openstreetmap.org">OpenStreetMap</a> | <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a> | <a href="http://mapbox.com">Mapbox</a>',
@@ -31,14 +31,14 @@ map = L.map('map', {
 	attributionControl: true
 });
 
-map.on('contextmenu', function ( e ) {
+map.on('contextmenu', ( e ) => {
 	e.preventDefault();
 });
 
 // Controles
 L.Control.zoomHome().addTo( map );
 
-var //Minimapa
+let //Minimapa
 streetsMinimapLayer = new L.TileLayer( mapboxUrl, {
 	attribution: attrib,
 	id: 'mapbox.streets',
@@ -58,7 +58,7 @@ miniMapOptions = {
 };
 new L.Control.MiniMap( streetsMinimapLayer, miniMapOptions ).addTo( map );
 
-var // Basemaps Switch
+let // Basemaps Switch
 basemapsOptions = {
 	basemaps: [streetsLayer, satelliteStreetLayer],
 	tileX: 0,
@@ -67,27 +67,27 @@ basemapsOptions = {
 };
 L.control.basemaps( basemapsOptions ).addTo( map );
 
-var
+let
 latLngOptions = {
 	separator: ' [] ',
 	emptyString: 'Latitude [] Longitude'
 };
 L.control.mousePosition( latLngOptions ).addTo( map );
 
-var
+let
 scaleOptions = {
 	metric: true,
 	imperial: false
 };
 L.control.scale( scaleOptions ).addTo( map );
 
-var //Cerca geográfica de visualizãção
+let //Cerca geográfica de visualizãção
 northWest = L.latLng( -4.904886794837085, -43.18674087524414 ),
 southEast = L.latLng( -5.332669664718695, -42.37615585327149 ),
 bounds = L.latLngBounds( northWest, southEast );
-map.setMaxBounds( bounds ),
+map.setMaxBounds( bounds );
 
-//Layers para controlar a inserção/remoção dos layers no cluster
+let //Layers para controlar a inserção/remoção dos layers no cluster
 produtoresLayerToControl = L.featureGroup(),
 feirasLayerToControl = L.featureGroup(),
 comercioLayerToControl = L.featureGroup(),
@@ -104,36 +104,27 @@ MarkerIcon = L.Icon.extend({
 		popupAnchor: [-2, -61]
 	}
 }),
-comercioMarkerIcon = new MarkerIcon({ iconUrl: 'assets/images/comercio-marker.png' }),
-feiraMarkerIcon = new MarkerIcon({ iconUrl: 'assets/images/feira-marker.png' }),
-produtorMarkerIcon = new MarkerIcon({ iconUrl: 'assets/images/produtor-marker.png' }),
-comercioMarkerIconSelected = new MarkerIcon({ iconUrl: 'assets/images/comercio-marker-selected.png' }),
-feiraMarkerIconSelected = new MarkerIcon({ iconUrl: 'assets/images/feira-marker-selected.png' }),
-produtorMarkerIconSelected = new MarkerIcon({ iconUrl: 'assets/images/produtor-marker-selected.png' }),
 
 // Contadores
 comerciosTotal = 0,
 feirasTotal = 0,
 produtoresTotal = 0; /*jshint ignore:line*/
 
-$.getJSON('data.geojson', function( data ) {
-	var geoJsonLayer = L.geoJson( data, {
-		pointToLayer: function( feature, latlng ) {
-			switch (feature.properties.current_tipo) {
-				case 'Comercio':
-					marker = L.marker( latlng, {icon: comercioMarkerIcon, title: feature.properties.nome} );
-					comerciosTotal += 1;
-					break;
-				case 'Produtor':
-					marker = L.marker( latlng, {icon: produtorMarkerIcon, title: feature.properties.nome} );
-					produtoresTotal += 1;
-					break;
-				case 'Feira':
-					marker = L.marker( latlng, {icon: feiraMarkerIcon, title: feature.properties.nome} );
-					feirasTotal += 1;
-					break;
-			}
-			return marker;
+let 
+iconMarkers = [
+	['Comercio' , new MarkerIcon({ iconUrl: 'assets/images/comercio-marker.png' })],
+	['Feira' , new MarkerIcon({ iconUrl: 'assets/images/feira-marker.png' })],
+	['Produtor', new MarkerIcon({ iconUrl: 'assets/images/produtor-marker.png' })],
+	['ComercioSelected' , new MarkerIcon({ iconUrl: 'assets/images/comercio-marker-selected.png' })],
+	['FeiraSelected' , new MarkerIcon({ iconUrl: 'assets/images/feira-marker-selected.png' })],
+	['ProdutorSelected' , new MarkerIcon({ iconUrl: 'assets/images/produtor-marker-selected.png' })]
+],
+iconMarkersMap = new Map(iconMarkers);
+
+$.getJSON('data.geojson', ( data ) => {
+	let geoJsonLayer = L.geoJson( data, {
+		pointToLayer: ( feature, latlng ) => {
+			return L.marker( latlng, {icon: iconMarkersMap.get(feature.properties.current_tipo), title: feature.properties.nome} );
 		},
 		onEachFeature: bindPopup
 	});
@@ -146,23 +137,23 @@ $.getJSON('data.geojson', function( data ) {
 	markersCluster.addTo( map );
 });
 
-function bindPopup( feature, layer ) {
-	var
+let bindPopup = ( feature, layer ) => {
+	let
 	props = feature.properties,
 	description = '',
 	icon = null;
 	feature.layer = layer;
 
 	if ( props ) {
-		description = '<div><strong>' + props.nome + '</strong></div>';
+		description = `<div><strong> ${props.nome} </strong></div>`;
 		layer.bindPopup( description );
 		layer.on({
-			mouseover : function(e) {
-				icon = getSelectedIconByType( layer.feature.properties.current_tipo );
+			mouseover : () => {
+				icon =  iconMarkersMap.get( `${layer.feature.properties.current_tipo}Selected` );
 				layer.setIcon(icon);
 			},
-			mouseout : function(e) {
-				icon = getIconByType( layer.feature.properties.current_tipo );
+			mouseout : () => {
+				icon = iconMarkersMap.get( layer.feature.properties.current_tipo );
 				layer.setIcon(icon);
 			}
 		});
@@ -179,56 +170,55 @@ function bindPopup( feature, layer ) {
 				break;
 		}
 	}
-}
-
-var //Agrupador de marcadores
+},
+//Agrupador de marcadores
 markersCluster = L.markerClusterGroup({
 	disableClusteringAtZoom: 13,
 	showCoverageOnHover: true,
 	spiderfyOnMaxZoom: false
 });
 
-function sycronizeListMarkers() {
-	var
+let sycronizeListMarkers = () => {
+	let
 	linePoint = '',
 	markerNames = sortList(markersCluster);
 	document.getElementById('list-markers').innerHTML = '';
 
-	for ( var i = 0, markerName; markerName = markerNames[i]; i++ ) {/*jshint ignore:line*/
-		linePoint += '<li class="list-group-item list-group-item-action">';
-		linePoint += markerName;
-		linePoint += '</li>';
+	for ( let i = 0, markerName; markerName = markerNames[i]; i++ ) {/*jshint ignore:line*/
+		linePoint += `<li class="list-group-item list-group-item-action">${markerName}</li>`;
 	}
 	$('#list-markers').append( linePoint );
 }
 
-function updateEventsOnMarkers() {
-	var nome = null;
-	$('#list-markers li').click(function () {
-		nome = $(this).text();
+let updateEventsOnMarkers = () => {
+	let 
+	nome = null,
+	icon = null;
+	$('#list-markers li').click( ( e ) => {
+		nome = $(e.currentTarget).text();
 		moveToPoint( markersCluster, nome );
 	});
 
-	$('#list-markers li').hover(function () {
-		nome = $(this).text();
-		markersCluster.eachLayer(function ( layer ) {
+	$('#list-markers li').hover( ( e ) => {
+		nome = $(e.currentTarget).text();
+		markersCluster.eachLayer( ( layer ) => {
 			if ( layer.feature.properties.nome === nome ) {
-				icon = getSelectedIconByType( layer.feature.properties.current_tipo );
-				layer.setIcon( icon );
+				icon =  iconMarkersMap.get( `${layer.feature.properties.current_tipo}Selected` );
+				layer.setIcon(icon);
 			}
 		});
 	},
-		function () {
-			markersCluster.eachLayer(function ( layer ) {
+		() => {
+			markersCluster.eachLayer( ( layer ) => {
 				if ( layer.feature.properties.nome === nome ) {
-					icon = getIconByType( layer.feature.properties.current_tipo );
-					layer.setIcon( icon );
+					icon = iconMarkersMap.get( layer.feature.properties.current_tipo );
+					layer.setIcon(icon);
 				}
 			});
 		});
 }
 
-map.on('layeradd ', function( e ) {
+map.on('layeradd ', ( e ) => {
 	if ( e.layer === comercioLayerToControl ) {
 		markersCluster.addLayer( comercioLayer );
 	}
@@ -242,7 +232,7 @@ map.on('layeradd ', function( e ) {
 	updateEventsOnMarkers();
 });
 
-map.on('layerremove', function( e ) {
+map.on('layerremove', ( e ) => {
 	if ( e.layer === comercioLayerToControl ) {
 		markersCluster.removeLayer( comercioLayer );
 	}
@@ -256,129 +246,92 @@ map.on('layerremove', function( e ) {
 	updateEventsOnMarkers();
 });
 
-$('#switch-produtor').on('change', function( e ) {
-	if ( $(this).is(':checked') ) {
+$('#switch-produtor').on('change', ( e ) => {
+	if ( $(e.currentTarget).is(':checked') ) {
 		map.addLayer( produtoresLayerToControl );
 	}
-	if ( $(this).is(':not(:checked)') ) {
+	if ( $(e.currentTarget).is(':not(:checked)') ) {
 		map.removeLayer( produtoresLayerToControl );
 	}
 });
 
-$('#switch-comercio').on('change', function( e ) {
-	if ( $(this).is(':checked') ) {
+$('#switch-comercio').on('change', ( e ) => {
+	if ( $(e.currentTarget).is(':checked') ) {
 		map.addLayer( comercioLayerToControl );
 	}
-	if ( $(this).is(':not(:checked)') ) {
+	if ( $(e.currentTarget).is(':not(:checked)') ) {
 		map.removeLayer( comercioLayerToControl );
 	}
 });
 
-$('#switch-feira').on('change', function( e ) {
-	if ( $(this).is(':checked') ) {
+$('#switch-feira').on('change', ( e ) => {
+	if ( $(e.currentTarget).is(':checked') ) {
 		map.addLayer( feirasLayerToControl );
 	}
-	if ( $(this).is(':not(:checked)') ) {
+	if ( $(e.currentTarget).is(':not(:checked)') ) {
 		map.removeLayer( feirasLayerToControl );
 	}
 });
 
 // Busca em tempo real (Ajax search)
-$('#search-input').keyup(function(){
-	var
+$('#search-input').keyup( () => {
+	let
 	searchField = $('#search-input').val(),
 	regex = new RegExp( searchField, "i" ),
-	count = 0;
+	count = 0,
+	listSearch = '';
 	if (searchField === '') {
 		document.getElementById('search-results').innerHTML = '';
 		return;
 	}
-	markersCluster.eachLayer(function ( layer ) {
+	markersCluster.eachLayer( ( layer ) => {
 		if ( layer.feature.properties.nome.search(regex) != -1 && searchField && count < 5 ){
-			var
-			listSearch = '';
-			listSearch += '<li class="list-group-item link-class">';
-			listSearch += layer.feature.properties.nome;
-			listSearch += '</li>';
-			document.getElementById('search-results').innerHTML += listSearch;
+			listSearch += `<li class="list-group-item link-class"> ${layer.feature.properties.nome} </li>`;
 			count++;
 		}
+		document.getElementById('search-results').innerHTML = listSearch;
 	});
 });
 
-$('#search-results').on('click', 'li', function() {
-	var
-	click_txt = $(this).text().split('|'),
-	inputValue = $.trim(click_txt[0]);
+$('#search-results').on('click', 'li', ( e ) => {
+	let inputValue = $(e.currentTarget).text().trim();
 	$('#search-input').val( inputValue );
 	moveToPoint( markersCluster, inputValue );
 	document.getElementById('search-results').innerHTML = '';
 });
 
-function getIconByType( tipo ) {
-	var icon = null;
-	switch( tipo ) {
-		case 'Comercio':
-			icon = comercioMarkerIcon;
-			break;
-		case 'Produtor':
-			icon = produtorMarkerIcon;
-			break;
-		case 'Feira':
-			icon = feiraMarkerIcon;
-			break;
-	}
-	return icon;
-}
-
-function getSelectedIconByType( tipo ) {
-	var icon = null;
-	switch( tipo ) {
-		case 'Comercio':
-			icon = comercioMarkerIconSelected;
-			break;
-		case 'Produtor':
-			icon = produtorMarkerIconSelected;
-			break;
-		case 'Feira':
-			icon = feiraMarkerIconSelected;
-			break;
-	}
-	return icon;
-}
-
-function moveToPoint( layerToSearch, name ) {
-	var //Variável evita mais de uma chamada ao 'zoomend' por vez 
-	controle = 0,
+let moveToPoint = ( layerToSearch, name ) => {
+	let // Variável evita mais de uma chamada ao 'zoomend' por vez 
+	controle = true,
 	latlng;
-	layerToSearch.eachLayer(function ( layer ) {
-		if ( layer.feature.properties.nome == name ){
+	layerToSearch.eachLayer( ( layer ) => {
+		if ( layer.feature.properties.nome === name ){
 			latlng = L.latLng( layer.feature.geometry.coordinates[1], layer.feature.geometry.coordinates[0] );
 			map.flyTo( latlng,14 );
-			map.on('zoomend', function( e ) {
-				if ( controle == 0 ) {
+			map.on('zoomend', () => {
+				if ( controle ) {
 					openPopUp( name ); 
+					controle = false;
 				}
-				controle = 1;
 			});
 		}
 	});
-}
+};
 
-function openPopUp( name ) {
-	var desc = '';
-	markersCluster.eachLayer(function ( layer ) {
-		if ( layer.feature.properties.nome == name ){
+let openPopUp = ( name ) => {
+	let desc = '';
+	markersCluster.eachLayer( ( layer ) => {
+		if ( layer.feature.properties.nome === name ){
 			desc = '<div><strong>' + name + '</strong><br/><br/></div>';
 			layer.bindPopup( desc ).openPopup();
 		}
 	});
-}
+};
 
-function sortList( layer ) {
-	var arrayTemp = [];
-	layer.eachLayer(function ( layer ) {
+let sortList = ( layer ) => {
+	let arrayTemp = [];
+	layer.eachLayer( ( layer ) => {
 		arrayTemp.push( layer.feature.properties.nome );
 	});
 	return arrayTemp.sort();
-}
+};
