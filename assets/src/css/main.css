@@ -113,6 +113,26 @@ body {
 	overflow-x: hidden;
 }
 
+#list-all-markers {
+	width: 100%;
+}
+
+#list-all-markers li {
+	height: 0;
+}
+
+#list-all-markers li.show {
+	height: 80px;
+}
+
+.slide-fade li {
+  transition: all 0.4s ease-out;
+  opacity: 1;
+}
+.slide-fade li.show {
+  opacity: 1;
+}
+
 #list-markers li:hover{
 	cursor: pointer;
 }

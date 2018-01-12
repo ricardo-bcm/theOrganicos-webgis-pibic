@@ -93,7 +93,7 @@ module.exports = function(grunt) {
 			}
 		},
 		jshint: {
-			src: ['assets/src/js/main.js'],
+			src: ['assets/src/js/main.js','assets/dist/js/main.js'],
 			options: {
         esversion: 6
 			}
