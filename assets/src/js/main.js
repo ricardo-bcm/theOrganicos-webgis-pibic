@@ -15,7 +15,7 @@ MarkerIcon = L.Icon.extend({
 	options: {
 		shadowUrl: 'assets/images/shadow.png',
 		iconSize: [54, 71],
-		iconAnchor: [29, 63],
+		iconAnchor: [27, 68],
 		popupAnchor: [-2, -61]
 	}
 }),
@@ -125,9 +125,7 @@ map.setMaxBounds( bounds );
 
 $.getJSON('data.geojson', data => {
 	let geoJsonLayer = L.geoJson( data, {
-		pointToLayer: ( feature, latlng ) => {
-			return L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome} );
-		},
+		pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome}),
 		onEachFeature: bindPopup
 	});
 
@@ -181,26 +179,26 @@ const sycronizeListMarkers = () => {
 	let
 	linePoint = '',
 	markerNames = sortList(markersCluster);
-	document.getElementById('list-markers').innerHTML = '';
+	document.getElementById('list-all-markers').innerHTML = '';
 
 	for ( let markerName of markerNames ) {
 		linePoint += `<li class="list-group-item list-group-item-action">${markerName}</li>`;
 	}
-	$('#list-markers').append( linePoint );
-	updateEventsOnMarkers();
+	$('#list-all-markers').append( linePoint );
+	updateEventsOnMarkers( '#list-markers li' );
 };
 
-const updateEventsOnMarkers = () => {
+const updateEventsOnMarkers = tag => {
 	let 
 	nome = null,
 	icon = null;
 
-	$('#list-markers li').click( e => {
+	$( tag ).click( e => {
 		nome = $(e.currentTarget).text();
 		moveToPoint( markersCluster, nome );
 	});
 
-	$('#list-markers li').hover( e => {
+	$( tag ).hover( e => {
 		nome = $(e.currentTarget).text();
 		markersCluster.eachLayer( layer => {
 			if ( layer.feature.properties.nome === nome ) {
@@ -219,12 +217,16 @@ const updateEventsOnMarkers = () => {
 
 map.on('layeradd ', e => {
 	let layerName = stringLayerName(e.layer);
-	layerName ? addRemoveLayerOfCluster[layerName]( true ) : null;
+	if ( layerName ) {
+		addRemoveLayerOfCluster[layerName]( true );
+	}
 });
 
 map.on('layerremove', e => {
 	let layerName = stringLayerName(e.layer);
-	layerName ? addRemoveLayerOfCluster[layerName]( false ) : null;
+	if ( layerName ) {
+		addRemoveLayerOfCluster[layerName]( false );
+	}
 });
 
 const addRemoveLayerOfCluster = {
@@ -304,7 +306,7 @@ const openPopUp = name => {
 	let desc = '';
 	markersCluster.eachLayer( layer => {
 		if ( layer.feature.properties.nome === name ){
-			desc = '<div><strong>' + name + '</strong><br/><br/></div>';
+			desc = `<div><strong> ${name} </strong><br/><br/></div>`;
 			layer.bindPopup( desc ).openPopup();
 		}
 	});
