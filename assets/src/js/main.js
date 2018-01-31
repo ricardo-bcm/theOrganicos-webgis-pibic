@@ -1,6 +1,6 @@
 /*
-	Autor: Ricardo Barbosa
-	Email: ricardobcm@outlook.com
+  Autor: Ricardo Barbosa
+  Email: ricardobcm@outlook.com
 */
 let //Layers para controlar a inserção/remoção dos layers no cluster
 produtoresLayerToControl = L.featureGroup(),
@@ -12,12 +12,12 @@ comercioLayer = L.layerGroup(),
 
 //Icones para os marcadores
 MarkerIcon = L.Icon.extend({
-	options: {
-		shadowUrl: 'assets/images/shadow.png',
-		iconSize: [54, 71],
-		iconAnchor: [27, 68],
-		popupAnchor: [-2, -61]
-	}
+  options: {
+    shadowUrl: 'assets/images/shadow.png',
+    iconSize: [54, 71],
+    iconAnchor: [27, 68],
+    popupAnchor: [-2, -61]
+  }
 }),
 
 // Contadores
@@ -34,12 +34,12 @@ feiraMarkerSelected = new MarkerIcon({ iconUrl: 'assets/images/feira-marker-sele
 produtorMarkerSelected = new MarkerIcon({ iconUrl: 'assets/images/produtor-marker-selected.png' }),
 
 iconMarkers = {
-	'Comercio': comercioMarker,
-	'Feira': feiraMarker,
-	'Produtor': produtorMarker,
-	'ComercioSelected': comercioMarkerSelected,
-	'FeiraSelected': feiraMarkerSelected,
-	'ProdutorSelected': produtorMarkerSelected
+  'Comercio': comercioMarker,
+  'Feira': feiraMarker,
+  'Produtor': produtorMarker,
+  'ComercioSelected': comercioMarkerSelected,
+  'FeiraSelected': feiraMarkerSelected,
+  'ProdutorSelected': produtorMarkerSelected
 },
 
 mapboxUrl = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}',
@@ -47,26 +47,26 @@ accessToken = 'pk.eyJ1IjoicmljYXJkb2JjbSIsImEiOiJjajlrMTJkejQxaTUyMzNwZ3cxcnM3MD
 attrib = '<a href="http://openstreetmap.org">OpenStreetMap</a> | <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a> | <a href="http://mapbox.com">Mapbox</a>',
 // Layers
 streetsLayer = new L.TileLayer( mapboxUrl, {
-	attribution: attrib,
-	id: 'mapbox.streets',
-	accessToken: accessToken,
-	label: 'Estradas'
+  attribution: attrib,
+  id: 'mapbox.streets',
+  accessToken: accessToken,
+  label: 'Estradas'
 }),
 satelliteStreetLayer = new L.TileLayer( mapboxUrl, {
-	attribution: attrib,
-	id: 'mapbox.streets-satellite',
-	accessToken: accessToken,
-	label: 'Satélite'
+  attribution: attrib,
+  id: 'mapbox.streets-satellite',
+  accessToken: accessToken,
+  label: 'Satélite'
 }),
 //Adicão do mapa
 map = L.map('map', {
-	center: [-5.1026, -42.8082],
-	zoom: 11,
-	minZoom: 11,
-	maxZoom: 18,
-	zoomControl: false,
-	closePopupOnClick: true,
-	attributionControl: true
+  center: [-5.1026, -42.8082],
+  zoom: 11,
+  minZoom: 11,
+  maxZoom: 18,
+  zoomControl: false,
+  closePopupOnClick: true,
+  attributionControl: true
 });
 
 map.on('contextmenu', e => e);
@@ -76,44 +76,44 @@ L.Control.zoomHome().addTo( map );
 
 let //Minimapa
 streetsMinimapLayer = new L.TileLayer( mapboxUrl, {
-	attribution: attrib,
-	id: 'mapbox.streets',
-	minZoom: 7,
-	maxZoom: 13,
-	accessToken: accessToken
+  attribution: attrib,
+  id: 'mapbox.streets',
+  minZoom: 7,
+  maxZoom: 13,
+  accessToken: accessToken
 }),
 miniMapOptions = {
-	position: 'topright',
-	toggleDisplay: true,
-	width : 120,
-	height : 120,
-	strings: {
-		hideText: 'Esconder minimapa',
-		showText: 'Exibir minimapa'
-	}
+  position: 'topright',
+  toggleDisplay: true,
+  width : 120,
+  height : 120,
+  strings: {
+    hideText: 'Esconder minimapa',
+    showText: 'Exibir minimapa'
+  }
 };
 new L.Control.MiniMap( streetsMinimapLayer, miniMapOptions ).addTo( map );
 
 let // Basemaps Switch
 basemapsOptions = {
-	basemaps: [streetsLayer, satelliteStreetLayer],
-	tileX: 0,
-	tileY: 0,
-	tileZ: 1
+  basemaps: [streetsLayer, satelliteStreetLayer],
+  tileX: 0,
+  tileY: 0,
+  tileZ: 1
 };
 L.control.basemaps( basemapsOptions ).addTo( map );
 
 let
 latLngOptions = {
-	separator: ' [] ',
-	emptyString: 'Latitude [] Longitude'
+  separator: ' [] ',
+  emptyString: 'Latitude [] Longitude'
 };
 L.control.mousePosition( latLngOptions ).addTo( map );
 
 let
 scaleOptions = {
-	metric: true,
-	imperial: false
+  metric: true,
+  imperial: false
 };
 L.control.scale( scaleOptions ).addTo( map );
 
@@ -124,130 +124,130 @@ bounds = L.latLngBounds( northWest, southEast );
 map.setMaxBounds( bounds );
 
 $.getJSON('data.geojson', data => {
-	let geoJsonLayer = L.geoJson( data, {
-		pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome}),
-		onEachFeature: bindPopup
-	});
+  let geoJsonLayer = L.geoJson( data, {
+    pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome}),
+    onEachFeature: bindPopup
+  });
 
-	document.getElementById('totalComercios').innerHTML = `(${comerciosTotal})`;
-	document.getElementById('totalFeiras').innerHTML = `(${feirasTotal})`;
-	document.getElementById('totalProdutores').innerHTML = `(${produtoresTotal})`;
-	produtoresLayerToControl.addTo( map );
-	feirasLayerToControl.addTo( map );
-	comercioLayerToControl.addTo( map );
-	markersCluster.addTo( map );
+  document.getElementById('totalComercios').innerHTML = `(${comerciosTotal})`;
+  document.getElementById('totalFeiras').innerHTML = `(${feirasTotal})`;
+  document.getElementById('totalProdutores').innerHTML = `(${produtoresTotal})`;
+  produtoresLayerToControl.addTo( map );
+  feirasLayerToControl.addTo( map );
+  comercioLayerToControl.addTo( map );
+  markersCluster.addTo( map );
 });
 
 const bindPopup = ( feature, layer ) => {
-	let
-	properties = feature.properties,
-	description = '';
-	feature.layer = layer;
+  let
+  properties = feature.properties,
+  description = '';
+  feature.layer = layer;
 
-	description = `<div><strong> ${properties.nome} </strong></div>`;
-	layer.bindPopup( description );
-	layer.on({
-		mouseover : () => layer.setIcon(iconMarkers[`${properties.current_tipo}Selected`]),
-		mouseout : () => layer.setIcon(iconMarkers[properties.current_tipo])
-	});
+  description = `<div><strong> ${properties.nome} </strong></div>`;
+  layer.bindPopup( description );
+  layer.on({
+    mouseover : () => layer.setIcon(iconMarkers[`${properties.current_tipo}Selected`]),
+    mouseout : () => layer.setIcon(iconMarkers[properties.current_tipo])
+  });
 
-	addLayerByType[properties.current_tipo]( layer );
+  addLayerByType[properties.current_tipo]( layer );
 },
 //Agrupador de marcadores
 markersCluster = L.markerClusterGroup({
-	disableClusteringAtZoom: 13,
-	showCoverageOnHover: true,
-	spiderfyOnMaxZoom: false
+  disableClusteringAtZoom: 13,
+  showCoverageOnHover: true,
+  spiderfyOnMaxZoom: false
 });
 
 const addLayerByType = {
-	'Comercio': layer => {
-		comercioLayer.addLayer( layer );
-		comerciosTotal++;
-	},
-	'Feira': layer => {
-		feirasLayer.addLayer( layer );
-		feirasTotal++;
-	},
-	'Produtor': layer => {
-		produtoresLayer.addLayer( layer );
-		produtoresTotal++;
-	}
+  'Comercio': layer => {
+    comercioLayer.addLayer( layer );
+    comerciosTotal++;
+  },
+  'Feira': layer => {
+    feirasLayer.addLayer( layer );
+    feirasTotal++;
+  },
+  'Produtor': layer => {
+    produtoresLayer.addLayer( layer );
+    produtoresTotal++;
+  }
 };
 
 const sycronizeListMarkers = () => {
-	let
-	linePoint = '',
-	markerNames = sortList(markersCluster);
-	document.getElementById('list-all-markers').innerHTML = '';
+  let
+  linePoint = '',
+  markerNames = sortList(markersCluster);
+  document.getElementById('list-all-markers').innerHTML = '';
 
-	for ( let markerName of markerNames ) {
-		linePoint += `<li class="list-group-item list-group-item-action">${markerName}</li>`;
-	}
-	$('#list-all-markers').append( linePoint );
-	updateEventsOnMarkers( '#list-markers li' );
+  for ( let markerName of markerNames ) {
+    linePoint += `<li class="list-group-item list-group-item-action">${markerName}</li>`;
+  }
+  $('#list-all-markers').append( linePoint );
+  updateEventsOnMarkers( '#list-markers li' );
 };
 
 const updateEventsOnMarkers = tag => {
-	let 
-	nome = null,
-	icon = null;
+  let 
+  nome = null,
+  icon = null;
 
-	$( tag ).click( e => {
-		nome = $(e.currentTarget).text();
-		moveToPoint( markersCluster, nome );
-	});
+  $( tag ).click( e => {
+    nome = $(e.currentTarget).text();
+    moveToPoint( markersCluster, nome );
+  });
 
-	$( tag ).hover( e => {
-		nome = $(e.currentTarget).text();
-		markersCluster.eachLayer( layer => {
-			if ( layer.feature.properties.nome === nome ) {
-				layer.setIcon(iconMarkers[`${layer.feature.properties.current_tipo}Selected`]);
-			}
-		});
-	},
-	() => {
-		markersCluster.eachLayer( layer => {
-			if ( layer.feature.properties.nome === nome ) {
-				layer.setIcon(iconMarkers[layer.feature.properties.current_tipo]);
-			}
-		});
-	});
+  $( tag ).hover( e => {
+    nome = $(e.currentTarget).text();
+    markersCluster.eachLayer( layer => {
+      if ( layer.feature.properties.nome === nome ) {
+        layer.setIcon(iconMarkers[`${layer.feature.properties.current_tipo}Selected`]);
+      }
+    });
+  },
+  () => {
+    markersCluster.eachLayer( layer => {
+      if ( layer.feature.properties.nome === nome ) {
+        layer.setIcon(iconMarkers[layer.feature.properties.current_tipo]);
+      }
+    });
+  });
 };
 
 map.on('layeradd ', e => {
-	let layerName = stringLayerName(e.layer);
-	if ( layerName ) {
-		addRemoveLayerOfCluster[layerName]( true );
-	}
+  let layerName = stringLayerName(e.layer);
+  if ( layerName ) {
+    addRemoveLayerOfCluster[layerName]( true );
+  }
 });
 
 map.on('layerremove', e => {
-	let layerName = stringLayerName(e.layer);
-	if ( layerName ) {
-		addRemoveLayerOfCluster[layerName]( false );
-	}
+  let layerName = stringLayerName(e.layer);
+  if ( layerName ) {
+    addRemoveLayerOfCluster[layerName]( false );
+  }
 });
 
 const addRemoveLayerOfCluster = {
-	comercioLayerToControl: isToAdd => {
-		isToAdd ? markersCluster.addLayer( comercioLayer ) : markersCluster.removeLayer( comercioLayer );
-		sycronizeListMarkers();
-	},
-	feirasLayerToControl: isToAdd => {
-		isToAdd ? markersCluster.addLayer( feirasLayer ) : markersCluster.removeLayer( feirasLayer );
-		sycronizeListMarkers();
-	},
-	produtoresLayerToControl: isToAdd => {
-		isToAdd ? markersCluster.addLayer( produtoresLayer ) : markersCluster.removeLayer( produtoresLayer );
-		sycronizeListMarkers();
-	}
+  comercioLayerToControl: isToAdd => {
+    isToAdd ? markersCluster.addLayer( comercioLayer ) : markersCluster.removeLayer( comercioLayer );
+    sycronizeListMarkers();
+  },
+  feirasLayerToControl: isToAdd => {
+    isToAdd ? markersCluster.addLayer( feirasLayer ) : markersCluster.removeLayer( feirasLayer );
+    sycronizeListMarkers();
+  },
+  produtoresLayerToControl: isToAdd => {
+    isToAdd ? markersCluster.addLayer( produtoresLayer ) : markersCluster.removeLayer( produtoresLayer );
+    sycronizeListMarkers();
+  }
 };
 
 const stringLayerName = layer =>
-	layer === comercioLayerToControl ? 'comercioLayerToControl' :
-	layer === feirasLayerToControl ? 'feirasLayerToControl' : 
-	layer === produtoresLayerToControl ? 'produtoresLayerToControl' : '';
+  layer === comercioLayerToControl ? 'comercioLayerToControl' :
+  layer === feirasLayerToControl ? 'feirasLayerToControl' : 
+  layer === produtoresLayerToControl ? 'produtoresLayerToControl' : '';
 
 $('#switch-produtor').on('change', e => $(e.currentTarget).is(':checked') ? map.addLayer( produtoresLayerToControl ) : map.removeLayer( produtoresLayerToControl ));
 $('#switch-comercio').on('change', e => $(e.currentTarget).is(':checked') ? map.addLayer( comercioLayerToControl ) : map.removeLayer( comercioLayerToControl ));
@@ -255,67 +255,67 @@ $('#switch-feira').on('change', e => $(e.currentTarget).is(':checked') ? map.add
 
 // Busca em tempo real (Ajax search)
 $('#search-input').keyup( () => {
-	let
-	searchField = $('#search-input').val(),
-	regex = new RegExp( searchField, "i" ),
-	listSearch = '',
-	propertiesFound = [];
-	if ( !searchField ) {
-		document.getElementById('search-results').innerHTML = '';
-	} else {
-		markersCluster.eachLayer( layer => {
-			if ( layer.feature.properties.nome.search(regex) != -1 && searchField && propertiesFound.length < 5 ){
-				propertiesFound.push(layer.feature.properties.nome);
-			}
-		});
-		propertiesFound.sort();
-		propertiesFound.forEach( function(element, index) {
-			listSearch += `<li class="list-group-item link-class"> ${element} </li>`;
-		});
-		document.getElementById('search-results').innerHTML = listSearch;
-		propertiesFound.length = 0;
-	}
+  let
+  searchField = $('#search-input').val(),
+  regex = new RegExp( searchField, "i" ),
+  listSearch = '',
+  propertiesFound = [];
+  if ( !searchField ) {
+    document.getElementById('search-results').innerHTML = '';
+  } else {
+    markersCluster.eachLayer( layer => {
+      if ( layer.feature.properties.nome.search(regex) != -1 && searchField && propertiesFound.length < 5 ){
+        propertiesFound.push(layer.feature.properties.nome);
+      }
+    });
+    propertiesFound.sort();
+    propertiesFound.forEach( function(element, index) {
+      listSearch += `<li class="list-group-item link-class"> ${element} </li>`;
+    });
+    document.getElementById('search-results').innerHTML = listSearch;
+    propertiesFound.length = 0;
+  }
 });
 
 $('#search-results').on('click', 'li', e => {
-	let inputValue = $(e.currentTarget).text().trim();
-	$('#search-input').val( inputValue );
-	moveToPoint( markersCluster, inputValue );
-	document.getElementById('search-results').innerHTML = '';
+  let inputValue = $(e.currentTarget).text().trim();
+  $('#search-input').val( inputValue );
+  moveToPoint( markersCluster, inputValue );
+  document.getElementById('search-results').innerHTML = '';
 });
 
 const moveToPoint = ( layerToSearch, name ) => {
-	let 
-	controle = true,// Variável evita mais de uma chamada ao 'zoomend' por vez 
-	latlng;
-	layerToSearch.eachLayer( layer => {
-		if ( layer.feature.properties.nome === name ){
-			latlng = L.latLng( layer.feature.geometry.coordinates[1], layer.feature.geometry.coordinates[0] );
-			map.flyTo( latlng,14 );
-			map.on('zoomend', () => {
-				if ( controle ) {
-					openPopUp( name ); 
-					controle = false;
-				}
-			});
-		}
-	});
+  let 
+  controle = true,// Variável evita mais de uma chamada ao 'zoomend' por vez 
+  latlng;
+  layerToSearch.eachLayer( layer => {
+    if ( layer.feature.properties.nome === name ){
+      latlng = L.latLng( layer.feature.geometry.coordinates[1], layer.feature.geometry.coordinates[0] );
+      map.flyTo( latlng,14 );
+      map.on('zoomend', () => {
+        if ( controle ) {
+          openPopUp( name ); 
+          controle = false;
+        }
+      });
+    }
+  });
 };
 
 const openPopUp = name => {
-	let desc = '';
-	markersCluster.eachLayer( layer => {
-		if ( layer.feature.properties.nome === name ){
-			desc = `<div><strong> ${name} </strong><br/><br/></div>`;
-			layer.bindPopup( desc ).openPopup();
-		}
-	});
+  let desc = '';
+  markersCluster.eachLayer( layer => {
+    if ( layer.feature.properties.nome === name ){
+      desc = `<div><strong> ${name} </strong><br/><br/></div>`;
+      layer.bindPopup( desc ).openPopup();
+    }
+  });
 };
 
 const sortList = layerToSort => {
-	let arrayTemp = [];
-	layerToSort.eachLayer( layer => {
-		arrayTemp.push( layer.feature.properties.nome );
-	});
-	return arrayTemp.sort();
+  let arrayTemp = [];
+  layerToSort.eachLayer( layer => {
+    arrayTemp.push( layer.feature.properties.nome );
+  });
+  return arrayTemp.sort();
 };
