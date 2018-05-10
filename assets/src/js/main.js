@@ -144,7 +144,12 @@ const bindPopup = ( feature, layer ) => {
   description = '';
   feature.layer = layer;
 
-  description = `<div><strong> ${properties.nome} </strong></div>`;
+  description = `<img src="assets/images/ifpi2.jpg"/>
+  <div><strong><h3> ${properties.nome} <h3></strong></div>
+  <div><strong>Endereço:</strong> Praça da Liberdade, 1597 - Centro (Sul), Teresina - PI, 64000-040</div>
+  <div><strong>Telefone:</strong> (86) 3131-9413</div>
+  <div><strong><a href="#">Mais informações</a></strong></div>`;
+
   layer.bindPopup( description );
   layer.on({
     mouseover : () => layer.setIcon(iconMarkers[`${properties.current_tipo}Selected`]),
