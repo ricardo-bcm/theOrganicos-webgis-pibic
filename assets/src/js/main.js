@@ -57,17 +57,29 @@ satelliteStreetLayer = new L.TileLayer( mapboxUrl, {
   id: 'mapbox.streets-satellite',
   accessToken: accessToken,
   label: 'Satélite'
-}),
+});
+
+let //Cerca geográfica de visualizãção
+northWest = L.latLng( -4.904886794837085, -43.18674087524414 ),
+southEast = L.latLng( -5.332669664718695, -42.37615585327149 ),
+bounds = L.latLngBounds( northWest, southEast );
+
 //Adicão do mapa
-map = L.map('map', {
+let map = L.map('map', {
   center: [-5.1026, -42.8082],
   zoom: 11,
-  minZoom: 11,
+  //minZoom: 11,
   maxZoom: 18,
   zoomControl: false,
   closePopupOnClick: true,
   attributionControl: true
 });
+
+var source = L.WMS.source("http://localhost:8080/geoserver/the_organicos_ws/wms", {
+    'transparent': true,
+    'format':'image/png'
+});
+source.getLayer("bairro").addTo(map);
 
 map.on('contextmenu', e => e);
 
@@ -117,21 +129,15 @@ scaleOptions = {
 };
 L.control.scale( scaleOptions ).addTo( map );
 
-let //Cerca geográfica de visualizãção
-northWest = L.latLng( -4.904886794837085, -43.18674087524414 ),
-southEast = L.latLng( -5.332669664718695, -42.37615585327149 ),
-bounds = L.latLngBounds( northWest, southEast );
-map.setMaxBounds( bounds );
+///map.setMaxBounds( bounds );
 
-$.getJSON('data.geojson', data => {
+//Unidade Produtoras
+$.getJSON('unidadesProdutoras.php', data => {
   let geoJsonLayer = L.geoJson( data, {
-    pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome}),
+    pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome_unidade_produtora}),
     onEachFeature: bindPopup
   });
 
-  document.getElementById('totalComercios').innerHTML = `(${comerciosTotal})`;
-  document.getElementById('totalFeiras').innerHTML = `(${feirasTotal})`;
-  document.getElementById('totalProdutores').innerHTML = `(${produtoresTotal})`;
   produtoresLayerToControl.addTo( map );
   feirasLayerToControl.addTo( map );
   comercioLayerToControl.addTo( map );
@@ -144,11 +150,13 @@ const bindPopup = ( feature, layer ) => {
   description = '';
   feature.layer = layer;
 
-  description = `<img src="assets/images/ifpi2.jpg"/>
-  <div><strong><h3> ${properties.nome} <h3></strong></div>
-  <div><strong>Endereço:</strong> Praça da Liberdade, 1597 - Centro (Sul), Teresina - PI, 64000-040</div>
-  <div><strong>Telefone:</strong> (86) 3131-9413</div>
-  <div><strong><a href="#">Mais informações</a></strong></div>`;
+  console.log(properties);
+
+  description = `
+  <div><strong><h3> ${properties.nome_unidade_produtora} <h3></strong></div>
+  <div><strong>Telefone:</strong> ${properties.contato_unidade_produtora}</div>
+  <div><strong>Funcionamento:</strong> ${properties.horario_funcionamento_unidade_produtora}</div>
+  <div><strong>Descrição:</strong> ${properties.descricao_unidade_produtora}</div>`;
 
   layer.bindPopup( description );
   layer.on({
@@ -178,19 +186,6 @@ const addLayerByType = {
     produtoresLayer.addLayer( layer );
     produtoresTotal++;
   }
-};
-
-const sycronizeListMarkers = () => {
-  let
-  linePoint = '',
-  markerNames = sortList(markersCluster);
-  document.getElementById('list-all-markers').innerHTML = '';
-
-  for ( let markerName of markerNames ) {
-    linePoint += `<li class="list-group-item list-group-item-action">${markerName}</li>`;
-  }
-  $('#list-all-markers').append( linePoint );
-  updateEventsOnMarkers( '#list-markers li' );
 };
 
 const updateEventsOnMarkers = tag => {
@@ -237,15 +232,12 @@ map.on('layerremove', e => {
 const addRemoveLayerOfCluster = {
   comercioLayerToControl: isToAdd => {
     isToAdd ? markersCluster.addLayer( comercioLayer ) : markersCluster.removeLayer( comercioLayer );
-    sycronizeListMarkers();
   },
   feirasLayerToControl: isToAdd => {
     isToAdd ? markersCluster.addLayer( feirasLayer ) : markersCluster.removeLayer( feirasLayer );
-    sycronizeListMarkers();
   },
   produtoresLayerToControl: isToAdd => {
     isToAdd ? markersCluster.addLayer( produtoresLayer ) : markersCluster.removeLayer( produtoresLayer );
-    sycronizeListMarkers();
   }
 };
 
@@ -269,8 +261,8 @@ $('#search-input').keyup( () => {
     document.getElementById('search-results').innerHTML = '';
   } else {
     markersCluster.eachLayer( layer => {
-      if ( layer.feature.properties.nome.search(regex) != -1 && searchField && propertiesFound.length < 5 ){
-        propertiesFound.push(layer.feature.properties.nome);
+      if ( layer.feature.properties.nome_unidade_produtora.search(regex) != -1 && searchField && propertiesFound.length < 5 ){
+        propertiesFound.push(layer.feature.properties.nome_unidade_produtora);
       }
     });
     propertiesFound.sort();
@@ -294,7 +286,7 @@ const moveToPoint = ( layerToSearch, name ) => {
   controle = true,// Variável evita mais de uma chamada ao 'zoomend' por vez 
   latlng;
   layerToSearch.eachLayer( layer => {
-    if ( layer.feature.properties.nome === name ){
+    if ( layer.feature.properties.nome_unidade_produtora === name ){
       latlng = L.latLng( layer.feature.geometry.coordinates[1], layer.feature.geometry.coordinates[0] );
       map.flyTo( latlng,14 );
       map.on('zoomend', () => {

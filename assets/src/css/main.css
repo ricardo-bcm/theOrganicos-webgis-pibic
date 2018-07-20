@@ -5,7 +5,7 @@
 :root {
   --main-color : #7ABA7A;
   --main-text-color : #FFF;
-  --popup-color : #999;
+  --popup-color :  #7ABA7A;
 }
 
 html, body, .container-fluid {
