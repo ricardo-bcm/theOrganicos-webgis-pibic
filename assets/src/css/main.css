@@ -107,6 +107,14 @@ body {
   font-size: small;
 }
 
+#producties-select {
+  padding: 10px;
+  border: 1px solid #CED4DA;
+  border-radius: 5px;
+  background-color: #fff;
+  font-size: small;
+}
+
 #list-markers {
   width: 100%;
   overflow-y: scroll;
@@ -144,6 +152,10 @@ body {
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;
             box-shadow:none !important;
+}
+
+label {
+  font-size: 14px;
 }
 
 /*Checkbox estilo material design*/
@@ -193,14 +205,25 @@ body {
   background-color: #A171A7;
 }
 
-#switch-com-label {
+#switch-comercio-label {
   background-color: #D46A6A;
 }
 
-#switch-prod-label {
+#switch-produtora-label {
   background-color: #91DC5A;
 }
 
+#switch-horticolas-label {
+  background-color: #2BCD1A;
+}
+
+#switch-furtiferas-label {
+  background-color: #F97605;
+}
+
+#switch-animal-label {
+  background-color: #A7604C;
+}
 /* Toogler Button Animation */
 .navbar-toggler:focus,
 .navbar-toggler:active {
@@ -351,6 +374,13 @@ a.leaflet-control-zoomhome-in, a.leaflet-control-zoomhome-out, a.leaflet-control
   }
 
   #locais-label, #select-layers-label {
+    text-align: center;
+    font-family: 'Manteka';
+    color: #fff;
+    margin: 10px 0 0 0;
+  }
+
+  #select-product-type {
     text-align: center;
     font-family: 'Manteka';
     color: #fff;

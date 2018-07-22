@@ -68,7 +68,7 @@ bounds = L.latLngBounds( northWest, southEast );
 let map = L.map('map', {
   center: [-5.1026, -42.8082],
   zoom: 11,
-  //minZoom: 11,
+  minZoom: 11,
   maxZoom: 18,
   zoomControl: false,
   closePopupOnClick: true,
@@ -79,9 +79,14 @@ var source = L.WMS.source("http://localhost:8080/geoserver/the_organicos_ws/wms"
     'transparent': true,
     'format':'image/png'
 });
-source.getLayer("bairro").addTo(map);
+let bairrosLayer = source.getLayer("bairro");
+let zonaRuralLayer = source.getLayer("zona_rural");
+bairrosLayer.addTo(map);
+zonaRuralLayer.addTo(map);
+
 
 map.on('contextmenu', e => e);
+map.scrollWheelZoom.disable();
 
 // Controles
 L.Control.zoomHome().addTo( map );
@@ -129,20 +134,52 @@ scaleOptions = {
 };
 L.control.scale( scaleOptions ).addTo( map );
 
-///map.setMaxBounds( bounds );
+var myStyle = {
+    "color": "#000000",
+    "weight": 1.0,
+    "opacity": 0.5,
+    "fillOpacity": 0.0
+};
 
-//Unidade Produtoras
-$.getJSON('unidadesProdutoras.php', data => {
-  let geoJsonLayer = L.geoJson( data, {
-    pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome_unidade_produtora}),
-    onEachFeature: bindPopup
+let bairrosGeoJsonLayer;
+
+$.getJSON('bairros.php', data => {
+  bairrosGeoJsonLayer = L.geoJson( data , {
+    onEachFeature: bindBairrosPopUp,
+    style: myStyle  
   });
 
+  //bairrosGeoJsonLayer.addTo(map);
+})
+
+const bindBairrosPopUp = (feature, layer ) => {
+  let properties = feature.properties;
+  layer.bindPopup(properties.nome_bairro);
+}
+
+const load = callback => {
+    $.getJSON('feiras.php', data => {
+    let geoJsonFeiraLayer = L.geoJson( data, {
+      pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome_unidade_produtora}),
+      onEachFeature: bindPopup
+    });
+  });
+  $.getJSON('unidadesProdutoras.php', data => {
+    let geoJsonFeiraLayer = L.geoJson( data, {
+      pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome_unidade_produtora}),
+      onEachFeature: bindPopup
+    });
+  });
+
+  callback();
+}
+
+const putThemOnMap = () => {
   produtoresLayerToControl.addTo( map );
   feirasLayerToControl.addTo( map );
   comercioLayerToControl.addTo( map );
   markersCluster.addTo( map );
-});
+}
 
 const bindPopup = ( feature, layer ) => {
   let
@@ -150,13 +187,27 @@ const bindPopup = ( feature, layer ) => {
   description = '';
   feature.layer = layer;
 
-  console.log(properties);
+  if (properties.current_tipo === 'Produtor') {
+      description += `
+      <div><strong><h3> ${properties.nome_unidade_produtora} <h3></strong></div>
+      <div><strong>Telefone:</strong> ${properties.contato_unidade_produtora}</div>
+      <div><strong>Funcionamento:</strong> ${properties.horario_funcionamento_unidade_produtora}</div>
+      <div><strong>Descrição:</strong> ${properties.descricao_unidade_produtora}</div>
+      <div>`;
+  } else if (properties.current_tipo === 'Feira') {
+      description += `
+      <div><strong><h3> ${properties.nome_feira} <h3></strong></div>
+      <div><strong>Telefone:</strong> ${properties.contato_feira}</div>
+      <div><strong>Funcionamento:</strong> ${properties.horario_funcionamento}</div>
+      <div><strong>Endereço:</strong> ${properties.endereco_feira}</div>
+      <div>`;
+  }
+    description += `<h4>Produtos</h4>`;
+    for (var i = properties.produtos.length - 1; i >= 0; i--) {
+      description += `${properties.produtos[i]}<br>`;
+    }
 
-  description = `
-  <div><strong><h3> ${properties.nome_unidade_produtora} <h3></strong></div>
-  <div><strong>Telefone:</strong> ${properties.contato_unidade_produtora}</div>
-  <div><strong>Funcionamento:</strong> ${properties.horario_funcionamento_unidade_produtora}</div>
-  <div><strong>Descrição:</strong> ${properties.descricao_unidade_produtora}</div>`;
+  description += `</div>`;
 
   layer.bindPopup( description );
   layer.on({
@@ -165,26 +216,35 @@ const bindPopup = ( feature, layer ) => {
   });
 
   addLayerByType[properties.current_tipo]( layer );
-},
+
+  map.removeLayer( produtoresLayerToControl );
+  map.addLayer( produtoresLayerToControl );
+  map.removeLayer( feirasLayerToControl );
+  map.addLayer( feirasLayerToControl );
+  map.removeLayer( comercioLayerToControl );
+  map.addLayer( comercioLayerToControl );
+};
+
+
 //Agrupador de marcadores
+let
 markersCluster = L.markerClusterGroup({
   disableClusteringAtZoom: 13,
   showCoverageOnHover: true,
   spiderfyOnMaxZoom: false
 });
 
+load(putThemOnMap);
+
 const addLayerByType = {
   'Comercio': layer => {
     comercioLayer.addLayer( layer );
-    comerciosTotal++;
   },
   'Feira': layer => {
     feirasLayer.addLayer( layer );
-    feirasTotal++;
   },
   'Produtor': layer => {
     produtoresLayer.addLayer( layer );
-    produtoresTotal++;
   }
 };
 
@@ -264,6 +324,7 @@ $('#search-input').keyup( () => {
       if ( layer.feature.properties.nome_unidade_produtora.search(regex) != -1 && searchField && propertiesFound.length < 5 ){
         propertiesFound.push(layer.feature.properties.nome_unidade_produtora);
       }
+     
     });
     propertiesFound.sort();
     propertiesFound.forEach( function(element, index) {
@@ -308,6 +369,7 @@ const openPopUp = name => {
     }
   });
 };
+
 
 const sortList = layerToSort => {
   let arrayTemp = [];

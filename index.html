@@ -62,24 +62,42 @@
               </div>
               <ul class="list-group" id="search-results"></ul>
             </div><!-- search-div -->
-            <span id="select-layers-label" class="d-none d-sm-block">Filtro</span>
+            <span id="select-layers-label" class="d-none d-sm-block">LOCAIS</span>
             <div id="layers-type" class="d-none d-sm-block">
-              Produtor de orgânicos
-              <div class="material-switch pull-right"><span id="totalProdutores"></span>
+              <label>Unidade Produtora</label>
+              <div class="material-switch pull-right">
                 <input id="switch-produtor" type="checkbox" checked>
-                <label for="switch-produtor" id="switch-prod-label"></label>
+                <label for="switch-produtor" id="switch-produtora-label"></label>
               </div> <br><br>
-              Comércio parceiro de orgânicos
-              <div class="material-switch pull-right"><span id="totalComercios"></span>
+              <label>Comércio parceiro de orgânicos</label>
+              <div class="material-switch pull-right">
                 <input id="switch-comercio" type="checkbox" checked>
-                <label for="switch-comercio" id="switch-com-label"></label>
+                <label for="switch-comercio" id="switch-comercio-label"></label>
               </div><br><br>
-              Feira de orgânicos
-              <div class="material-switch pull-right"><span id="totalFeiras"></span>
+              <label>Feira de orgânicos</label>
+              <div class="material-switch pull-right">
                 <input id="switch-feira" type="checkbox" checked>
                 <label for="switch-feira" id="switch-feira-label"></label>
               </div>
             </div> <!-- layers-type -->
+            <span id="select-product-type" class="d-none d-sm-block">Tipos de Produtos</span>
+            <div id="producties-select" class="d-none d-sm-block">
+             <label>Hortícolas</label>
+             <div class="material-switch pull-right">
+               <input id="switch-horticolas" type="checkbox" checked>
+               <label for="switch-horticolas" id="switch-horticolas-label"></label>
+             </div><br><br>
+             <label>Frutíferas</label>
+             <div class="material-switch pull-right">
+               <input id="switch-furtiferas" type="checkbox" checked>
+               <label for="switch-furtiferas" id="switch-furtiferas-label"></label>
+             </div><br><br>
+             <label>Produção Animal</label>
+             <div class="material-switch pull-right">
+               <input id="switch-animal" type="checkbox" checked>
+               <label for="switch-animal" id="switch-animal-label"></label>
+             </div>
+            </div> <!-- producties-select -->
           </div> <!-- information-wrapper -->
         </div> <!-- row -->
       </div> <!-- col-md-3 -->
@@ -155,9 +173,7 @@
   <script src="node_modules/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
   <script src="node_modules/leaflet-mouse-position/src/L.Control.MousePosition.js"></script>
   <script src="libs/leaflet.zoomhome/dist/leaflet.zoomhome.min.js"></script>
-  <script src="libs/leaflet.wms/src/leaflet.wms.js"></script>
-  <script src="libs/proj4leaflet/lib/proj4.js"></script>
-  <script src="libs/proj4leaflet/src/proj4leaflet.js"></script>
+  <script src="libs/leaflet.wms/leaflet.wms.js"></script>
   <script src="assets/src/js/main.js"></script>
 </body>
 </html>
