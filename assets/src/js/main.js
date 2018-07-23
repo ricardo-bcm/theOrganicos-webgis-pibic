@@ -9,8 +9,18 @@ comercioLayerToControl = L.featureGroup(),
 produtoresLayer = L.layerGroup(),
 feirasLayer = L.layerGroup(),
 comercioLayer = L.layerGroup(),
+bairrosLayer = L.layerGroup();
+
+//Agrupador de marcadores
+let
+markersCluster = L.markerClusterGroup({
+  disableClusteringAtZoom: 13,
+  showCoverageOnHover: true,
+  spiderfyOnMaxZoom: false
+});
 
 //Icones para os marcadores
+let
 MarkerIcon = L.Icon.extend({
   options: {
     shadowUrl: 'assets/images/shadow.png',
@@ -18,12 +28,7 @@ MarkerIcon = L.Icon.extend({
     iconAnchor: [27, 68],
     popupAnchor: [-2, -61]
   }
-}),
-
-// Contadores
-comerciosTotal = 0,
-feirasTotal = 0,
-produtoresTotal = 0;
+});
 
 const
 comercioMarker = new MarkerIcon({ iconUrl: 'assets/images/comercio-marker.png' }),
@@ -40,8 +45,9 @@ iconMarkers = {
   'ComercioSelected': comercioMarkerSelected,
   'FeiraSelected': feiraMarkerSelected,
   'ProdutorSelected': produtorMarkerSelected
-},
+};
 
+let
 mapboxUrl = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}',
 accessToken = 'pk.eyJ1IjoicmljYXJkb2JjbSIsImEiOiJjajlrMTJkejQxaTUyMzNwZ3cxcnM3MDU2In0.pr0XFTVGiylyl6Sth57t9g',
 attrib = '<a href="http://openstreetmap.org">OpenStreetMap</a> | <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a> | <a href="http://mapbox.com">Mapbox</a>',
@@ -75,15 +81,21 @@ let map = L.map('map', {
   attributionControl: true
 });
 
-var source = L.WMS.source("http://localhost:8080/geoserver/the_organicos_ws/wms", {
+
+var mySource = L.WMS.Source.extend({
+    'showFeatureInfo': function(latlng, info) {
+        //Do nothing
+    }
+});
+
+var source = new mySource("http://localhost:8080/geoserver/the_organicos_ws/wms", {
     'transparent': true,
     'format':'image/png'
 });
-let bairrosLayer = source.getLayer("bairro");
+//let bairrosLayer = source.getLayer("bairro");
 let zonaRuralLayer = source.getLayer("zona_rural");
-bairrosLayer.addTo(map);
+//bairrosLayer.addTo(map);
 zonaRuralLayer.addTo(map);
-
 
 map.on('contextmenu', e => e);
 map.scrollWheelZoom.disable();
@@ -134,33 +146,34 @@ scaleOptions = {
 };
 L.control.scale( scaleOptions ).addTo( map );
 
-var myStyle = {
+let bairroEstilo = {
     "color": "#000000",
     "weight": 1.0,
     "opacity": 0.5,
     "fillOpacity": 0.0
 };
 
-let bairrosGeoJsonLayer;
-
-$.getJSON('bairros.php', data => {
-  bairrosGeoJsonLayer = L.geoJson( data , {
-    onEachFeature: bindBairrosPopUp,
-    style: myStyle  
-  });
-
-  //bairrosGeoJsonLayer.addTo(map);
-})
+let highlight = {
+    "color": "#7ABA7A",
+    "weight": 5,
+    "opacity": 0.80,
+};
 
 const bindBairrosPopUp = (feature, layer ) => {
   let properties = feature.properties;
   layer.bindPopup(properties.nome_bairro);
+  layer.on({
+    click: e => {
+      let lay = e.target;
+      //lay.setStyle(highlight);
+    }
+  })
 }
 
 const load = callback => {
     $.getJSON('feiras.php', data => {
     let geoJsonFeiraLayer = L.geoJson( data, {
-      pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome_unidade_produtora}),
+      pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome_feira}),
       onEachFeature: bindPopup
     });
   });
@@ -169,6 +182,22 @@ const load = callback => {
       pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome_unidade_produtora}),
       onEachFeature: bindPopup
     });
+  });
+  $.getJSON('comercios.php', data => {
+    let geoJsonFeiraLayer = L.geoJson( data, {
+      pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome_fantasia}),
+      onEachFeature: bindPopup
+    });
+  });
+  $.getJSON('bairros.php', data => {
+    let bairrosGeoJsonLayer = L.geoJson( data , {
+      onEachFeature: bindBairrosPopUp,
+      style: bairroEstilo  
+    });
+
+    bairrosLayer = bairrosGeoJsonLayer;
+
+    bairrosLayer.addTo(map);
   });
 
   callback();
@@ -201,7 +230,15 @@ const bindPopup = ( feature, layer ) => {
       <div><strong>Funcionamento:</strong> ${properties.horario_funcionamento}</div>
       <div><strong>Endereço:</strong> ${properties.endereco_feira}</div>
       <div>`;
+  } else if (properties.current_tipo === 'Comercio') {
+      description += `
+      <div><strong><h3> ${properties.nome_fantasia} <h3></strong></div>
+      <div><strong>Telefone:</strong> ${properties.contato_comercio}</div>
+      <div><strong>Cnpf:</strong> ${properties.cnpj_comercio}</div>
+      <div><strong>Descrição:</strong> ${properties.descricao_comercio}</div>
+      <div>`;
   }
+
     description += `<h4>Produtos</h4>`;
     for (var i = properties.produtos.length - 1; i >= 0; i--) {
       description += `${properties.produtos[i]}<br>`;
@@ -224,15 +261,6 @@ const bindPopup = ( feature, layer ) => {
   map.removeLayer( comercioLayerToControl );
   map.addLayer( comercioLayerToControl );
 };
-
-
-//Agrupador de marcadores
-let
-markersCluster = L.markerClusterGroup({
-  disableClusteringAtZoom: 13,
-  showCoverageOnHover: true,
-  spiderfyOnMaxZoom: false
-});
 
 load(putThemOnMap);
 
@@ -310,7 +338,7 @@ $('#switch-produtor').on('change', e => $(e.currentTarget).is(':checked') ? map.
 $('#switch-comercio').on('change', e => $(e.currentTarget).is(':checked') ? map.addLayer( comercioLayerToControl ) : map.removeLayer( comercioLayerToControl ));
 $('#switch-feira').on('change', e => $(e.currentTarget).is(':checked') ? map.addLayer( feirasLayerToControl ) : map.removeLayer( feirasLayerToControl ));
 
-// Busca em tempo real (Ajax search)
+// Busca por bairro
 $('#search-input').keyup( () => {
   let
   searchField = $('#search-input').val(),
@@ -320,34 +348,56 @@ $('#search-input').keyup( () => {
   if ( !searchField ) {
     document.getElementById('search-results').innerHTML = '';
   } else {
-    markersCluster.eachLayer( layer => {
-      if ( layer.feature.properties.nome_unidade_produtora.search(regex) != -1 && searchField && propertiesFound.length < 5 ){
-        propertiesFound.push(layer.feature.properties.nome_unidade_produtora);
+    bairrosLayer.eachLayer( layer => {
+      layer.setStyle(bairroEstilo);
+      if ( layer.feature.properties.nome_bairro.search(regex) != -1 && searchField){
+        propertiesFound.push(layer.feature.properties.nome_bairro);
       }
      
     });
-    propertiesFound.sort();
-    propertiesFound.forEach( function(element, index) {
+
+    let arrayRemoveEquals = propertiesFound.reduce(function (acumulador, nome) {
+      if (acumulador.indexOf(nome) == -1) {
+        acumulador.push(nome)
+      }
+      return acumulador;
+    }, []);
+
+    arrayRemoveEquals = arrayRemoveEquals.slice(0,6);
+    arrayRemoveEquals.sort();
+    arrayRemoveEquals.forEach( function(element, index) {
       listSearch += `<li class="list-group-item link-class"> ${element} </li>`;
     });
     document.getElementById('search-results').innerHTML = listSearch;
     propertiesFound.length = 0;
+    arrayRemoveEquals.length = 0;
   }
 });
 
 $('#search-results').on('click', 'li', e => {
   let inputValue = $(e.currentTarget).text().trim();
   $('#search-input').val( inputValue );
-  moveToPoint( markersCluster, inputValue );
+  moveToPolygon( bairrosLayer, inputValue );
   document.getElementById('search-results').innerHTML = '';
 });
+
+const moveToPolygon = (layerToSearch, name ) => {
+  layerToSearch.eachLayer( layer => {
+    if ( layer.feature.properties.nome_bairro === name ){
+      layer.setStyle(highlight);
+      map.setView(layer._latlngs[0][0][0],14);
+      layer.bindPopup(name).openPopup();
+    }
+  })
+}
 
 const moveToPoint = ( layerToSearch, name ) => {
   let 
   controle = true,// Variável evita mais de uma chamada ao 'zoomend' por vez 
   latlng;
   layerToSearch.eachLayer( layer => {
-    if ( layer.feature.properties.nome_unidade_produtora === name ){
+    if ( layer.feature.properties.nome_bairro === name ){
+      console.log(layer);
       latlng = L.latLng( layer.feature.geometry.coordinates[1], layer.feature.geometry.coordinates[0] );
       map.flyTo( latlng,14 );
       map.on('zoomend', () => {
