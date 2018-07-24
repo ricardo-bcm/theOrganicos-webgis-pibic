@@ -82,19 +82,17 @@ let map = L.map('map', {
 });
 
 
-var mySource = L.WMS.Source.extend({
+let mySource = L.WMS.Source.extend({
     'showFeatureInfo': function(latlng, info) {
         //Do nothing
     }
 });
 
-var source = new mySource("http://localhost:8080/geoserver/the_organicos_ws/wms", {
+let source = new mySource("http://localhost:8080/geoserver/the_organicos_ws/wms", {
     'transparent': true,
     'format':'image/png'
 });
-//let bairrosLayer = source.getLayer("bairro");
 let zonaRuralLayer = source.getLayer("zona_rural");
-//bairrosLayer.addTo(map);
 zonaRuralLayer.addTo(map);
 
 map.on('contextmenu', e => e);
@@ -134,7 +132,7 @@ L.control.basemaps( basemapsOptions ).addTo( map );
 
 let
 latLngOptions = {
-  separator: ' [] ',
+  separator: ' | ',
   emptyString: 'Latitude [] Longitude'
 };
 L.control.mousePosition( latLngOptions ).addTo( map );
@@ -153,7 +151,7 @@ let bairroEstilo = {
     "fillOpacity": 0.0
 };
 
-let highlight = {
+let bairroDestaqueEstilo = {
     "color": "#7ABA7A",
     "weight": 5,
     "opacity": 0.80,
@@ -165,7 +163,7 @@ const bindBairrosPopUp = (feature, layer ) => {
   layer.on({
     click: e => {
       let lay = e.target;
-      //lay.setStyle(highlight);
+      //lay.setStyle(bairroDestaqueEstilo);
     }
   })
 }
@@ -218,21 +216,21 @@ const bindPopup = ( feature, layer ) => {
 
   if (properties.current_tipo === 'Produtor') {
       description += `
-      <div><strong><h3> ${properties.nome_unidade_produtora} <h3></strong></div>
+      <div><strong><h3> ${properties.nome} <h3></strong></div>
       <div><strong>Telefone:</strong> ${properties.contato_unidade_produtora}</div>
       <div><strong>Funcionamento:</strong> ${properties.horario_funcionamento_unidade_produtora}</div>
       <div><strong>Descrição:</strong> ${properties.descricao_unidade_produtora}</div>
       <div>`;
   } else if (properties.current_tipo === 'Feira') {
       description += `
-      <div><strong><h3> ${properties.nome_feira} <h3></strong></div>
+      <div><strong><h3> ${properties.nome} <h3></strong></div>
       <div><strong>Telefone:</strong> ${properties.contato_feira}</div>
       <div><strong>Funcionamento:</strong> ${properties.horario_funcionamento}</div>
       <div><strong>Endereço:</strong> ${properties.endereco_feira}</div>
       <div>`;
   } else if (properties.current_tipo === 'Comercio') {
       description += `
-      <div><strong><h3> ${properties.nome_fantasia} <h3></strong></div>
+      <div><strong><h3> ${properties.nome} <h3></strong></div>
       <div><strong>Telefone:</strong> ${properties.contato_comercio}</div>
       <div><strong>Cnpf:</strong> ${properties.cnpj_comercio}</div>
       <div><strong>Descrição:</strong> ${properties.descricao_comercio}</div>
@@ -240,7 +238,7 @@ const bindPopup = ( feature, layer ) => {
   }
 
     description += `<h4>Produtos</h4>`;
-    for (var i = properties.produtos.length - 1; i >= 0; i--) {
+    for (let i = properties.produtos.length - 1; i >= 0; i--) {
       description += `${properties.produtos[i]}<br>`;
     }
 
@@ -339,14 +337,14 @@ $('#switch-comercio').on('change', e => $(e.currentTarget).is(':checked') ? map.
 $('#switch-feira').on('change', e => $(e.currentTarget).is(':checked') ? map.addLayer( feirasLayerToControl ) : map.removeLayer( feirasLayerToControl ));
 
 // Busca por bairro
-$('#search-input').keyup( () => {
+$('#search-bairros-input').keyup( () => {
   let
-  searchField = $('#search-input').val(),
+  searchField = $('#search-bairros-input').val(),
   regex = new RegExp( searchField, "i" ),
   listSearch = '',
   propertiesFound = [];
   if ( !searchField ) {
-    document.getElementById('search-results').innerHTML = '';
+    document.getElementById('search-bairros-results').innerHTML = '';
   } else {
     bairrosLayer.eachLayer( layer => {
       layer.setStyle(bairroEstilo);
@@ -356,35 +354,110 @@ $('#search-input').keyup( () => {
      
     });
 
-    let arrayRemoveEquals = propertiesFound.reduce(function (acumulador, nome) {
-      if (acumulador.indexOf(nome) == -1) {
-        acumulador.push(nome)
-      }
-      return acumulador;
-    }, []);
+    if (propertiesFound.length === 0) {
+      propertiesFound.push('Nenhum resultado');
+    } else {
+      propertiesFound = propertiesFound.reduce(function (acumulador, nome) {
+        if (acumulador.indexOf(nome) == -1) {
+          acumulador.push(nome)
+        }
+        return acumulador;
+      }, []);
 
-    arrayRemoveEquals = arrayRemoveEquals.slice(0,6);
-    arrayRemoveEquals.sort();
-    arrayRemoveEquals.forEach( function(element, index) {
+      propertiesFound = propertiesFound.slice(0,6);
+      propertiesFound.sort();
+    }
+    propertiesFound.forEach( function(element, index) {
       listSearch += `<li class="list-group-item link-class"> ${element} </li>`;
     });
-    document.getElementById('search-results').innerHTML = listSearch;
+    document.getElementById('search-bairros-results').innerHTML = listSearch;
     propertiesFound.length = 0;
-    arrayRemoveEquals.length = 0;
   }
 });
 
-$('#search-results').on('click', 'li', e => {
+$('#search-bairros-results').on('click', 'li', e => {
   let inputValue = $(e.currentTarget).text().trim();
-  $('#search-input').val( inputValue );
+  $('#search-bairros-input').val( inputValue );
   moveToPolygon( bairrosLayer, inputValue );
-  document.getElementById('search-results').innerHTML = '';
+  document.getElementById('search-bairros-results').innerHTML = '';
 });
+
+// Busca por produto / local
+$('#search-all-input').keyup( () => {
+  let
+  searchField = $('#search-all-input').val(),
+  regex = new RegExp( searchField, "i" ),
+  listSearch = '',
+  propertiesFound = [];
+  if ( !searchField ) {
+    document.getElementById('search-all-results').innerHTML = '';
+  } else {
+    markersCluster.eachLayer( layer => {
+      let properties = layer.feature.properties;
+        if ( properties.nome.search(regex) != -1 && searchField){
+          propertiesFound.push(layer.feature.properties.nome);
+        } else {
+            let produtos = properties.produtos;
+            for (let i = produtos.length - 1; i >= 0; i--) {
+              if(produtos[i].search(regex) != -1 && searchField){
+                propertiesFound.push(properties.nome);
+              }
+            }
+        }
+    });
+
+    if (propertiesFound.length === 0) {
+      propertiesFound.push('Nenhum resultado');
+    } else {
+      propertiesFound.sort();
+      propertiesFound = propertiesFound.reduce(function (acumulador, nome) {
+        if (acumulador.indexOf(nome) == -1) {
+          acumulador.push(nome)
+        }
+        return acumulador;
+      }, []);
+    }
+
+
+    propertiesFound.forEach( function(element, index) {
+      let layer = getLayerByAttribute(markersCluster,element);
+      listSearch += `<li class="list-group-item link-class"> <span class="tituloNaLista">${element}</span> <br>`;
+      layer.feature.properties.produtos.forEach((elementI, indexI) => {
+        if (indexI < 5) {
+          listSearch += `<span class="produtosNaLista">${elementI}</span>, `;
+        }
+      });
+    });
+
+    listSearch += `...`;
+    listSearch += `</li>`;
+
+    document.getElementById('search-all-results').innerHTML = listSearch;
+    propertiesFound.length = 0;
+  }
+});
+
+$('#search-all-results').on('click', 'li', e => {
+  let inputValue = $('.tituloNaLista').text().trim();
+  $('#search-all-input').val( inputValue );
+  moveToPoint( markersCluster, inputValue );
+  document.getElementById('search-all-results').innerHTML = '';
+});
+
+const getLayerByAttribute = (layerGroup, attribute) => {
+  let layerReturn;
+  layerGroup.eachLayer(layer => {
+    if (layer.feature.properties.nome === attribute) {
+        layerReturn = layer;
+    }
+  });
+  return layerReturn;
+}
 
 const moveToPolygon = (layerToSearch, name ) => {
   layerToSearch.eachLayer( layer => {
     if ( layer.feature.properties.nome_bairro === name ){
-      layer.setStyle(highlight);
+      layer.setStyle(bairroDestaqueEstilo);
       map.setView(layer._latlngs[0][0][0],14);
       layer.bindPopup(name).openPopup();
     }
@@ -396,30 +469,18 @@ const moveToPoint = ( layerToSearch, name ) => {
   controle = true,// Variável evita mais de uma chamada ao 'zoomend' por vez 
   latlng;
   layerToSearch.eachLayer( layer => {
-    if ( layer.feature.properties.nome_bairro === name ){
-      console.log(layer);
+    if ( layer.feature.properties.nome === name ){
       latlng = L.latLng( layer.feature.geometry.coordinates[1], layer.feature.geometry.coordinates[0] );
       map.flyTo( latlng,14 );
       map.on('zoomend', () => {
         if ( controle ) {
-          openPopUp( name ); 
+          layer.openPopup();
           controle = false;
         }
       });
     }
   });
 };
-
-const openPopUp = name => {
-  let desc = '';
-  markersCluster.eachLayer( layer => {
-    if ( layer.feature.properties.nome === name ){
-      desc = `<div><strong> ${name} </strong><br/><br/></div>`;
-      layer.bindPopup( desc ).openPopup();
-    }
-  });
-};
-
 
 const sortList = layerToSort => {
   let arrayTemp = [];

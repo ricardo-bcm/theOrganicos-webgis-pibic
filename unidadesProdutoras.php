@@ -15,9 +15,12 @@ $json = file_get_contents($url);
 $json = json_decode($json);
 
 foreach ($json->features as $key => $value) {
-	$json->features[$key]->properties->current_tipo = "Produtor";
+	$value->properties->current_tipo = "Produtor";
+	$name = $value->properties->nome_unidade_produtora;
+	unset($value->properties->nome_unidade_produtora);
+	$value->properties->nome = $name;
 
-	$unidadeProdutoraId = filter_var($json->features[$key]->id, FILTER_SANITIZE_NUMBER_INT);	
+	$unidadeProdutoraId = filter_var($value->id, FILTER_SANITIZE_NUMBER_INT);	
 	$sql = "SELECT p.nome_produto
 				FROM produto p , unidade_produtora_produto upp
 					WHERE upp.unidade_produtora_id_unidade_produtora = $unidadeProdutoraId
@@ -29,7 +32,7 @@ foreach ($json->features as $key => $value) {
 		$produtosAndUnidades[] = $row[0];
 	}
 
-	$json->features[$key]->properties->produtos[] = $produtosAndUnidades;
+	$value->properties->produtos = $produtosAndUnidades;
 }
 
 $json = json_encode($json,JSON_UNESCAPED_UNICODE);

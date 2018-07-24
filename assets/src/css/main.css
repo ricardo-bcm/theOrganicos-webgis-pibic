@@ -85,12 +85,27 @@ body {
   background-color: var(--main-color);
 }
 
-/*Busca*/
-#search-div {
+/*Busca por bairro*/
+#search-bairros-div {
+  margin-top: 10px;
   padding:0;
 }
 
-#search-results {
+#search-bairros-results {
+  position: absolute;
+  width: 89%;
+  z-index: 1001;
+  -webkit-box-shadow: 20px 4px 9px  rgba(0,0,0,.25);
+     -moz-box-shadow: 20px 4px 9px  rgba(0,0,0,.25);
+          box-shadow: 20px 4px 9px  rgba(0,0,0,.25);
+}
+
+/*Busca por lugares/produtos*/
+#search-all-div {
+  padding:0;
+}
+
+#search-all-results {
   position: absolute;
   width: 89%;
   z-index: 1001;
@@ -114,6 +129,16 @@ body {
   background-color: #fff;
   font-size: small;
 }
+
+.produtosNaLista {
+  font-size: 10px;
+}
+
+.tituloNaLista {
+  font-weight: bolder;
+  font-size: 18px;
+}
+
 
 #list-markers {
   width: 100%;
