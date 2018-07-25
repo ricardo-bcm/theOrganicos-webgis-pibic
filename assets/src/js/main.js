@@ -169,25 +169,25 @@ const bindBairrosPopUp = (feature, layer ) => {
 }
 
 const load = callback => {
-    $.getJSON('feiras.php', data => {
+    $.getJSON('assets/dbscripts/feiras.php', data => {
     let geoJsonFeiraLayer = L.geoJson( data, {
       pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome_feira}),
       onEachFeature: bindPopup
     });
   });
-  $.getJSON('unidadesProdutoras.php', data => {
+  $.getJSON('assets/dbscripts/unidadesProdutoras.php', data => {
     let geoJsonFeiraLayer = L.geoJson( data, {
       pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome_unidade_produtora}),
       onEachFeature: bindPopup
     });
   });
-  $.getJSON('comercios.php', data => {
+  $.getJSON('assets/dbscripts/comercios.php', data => {
     let geoJsonFeiraLayer = L.geoJson( data, {
       pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome_fantasia}),
       onEachFeature: bindPopup
     });
   });
-  $.getJSON('bairros.php', data => {
+  $.getJSON('assets/dbscripts/bairros.php', data => {
     let bairrosGeoJsonLayer = L.geoJson( data , {
       onEachFeature: bindBairrosPopUp,
       style: bairroEstilo  
@@ -239,7 +239,7 @@ const bindPopup = ( feature, layer ) => {
 
     description += `<h4>Produtos</h4>`;
     for (let i = properties.produtos.length - 1; i >= 0; i--) {
-      description += `${properties.produtos[i]}<br>`;
+      description += `${properties.produtos[i]} ,`;
     }
 
   description += `</div>`;
@@ -348,7 +348,7 @@ $('#search-bairros-input').keyup( () => {
   } else {
     bairrosLayer.eachLayer( layer => {
       layer.setStyle(bairroEstilo);
-      if ( layer.feature.properties.nome_bairro.search(regex) != -1 && searchField){
+      if ( layer.feature.properties.nome_bairro.search(regex) != -1 &&  searchField){
         propertiesFound.push(layer.feature.properties.nome_bairro);
       }
      
@@ -364,7 +364,7 @@ $('#search-bairros-input').keyup( () => {
         return acumulador;
       }, []);
 
-      propertiesFound = propertiesFound.slice(0,6);
+      propertiesFound = propertiesFound.slice(0,5);
       propertiesFound.sort();
     }
     propertiesFound.forEach( function(element, index) {
@@ -389,6 +389,7 @@ $('#search-all-input').keyup( () => {
   regex = new RegExp( searchField, "i" ),
   listSearch = '',
   propertiesFound = [];
+  highlightForSearch(propertiesFound, markersCluster);
   if ( !searchField ) {
     document.getElementById('search-all-results').innerHTML = '';
   } else {
@@ -408,6 +409,7 @@ $('#search-all-input').keyup( () => {
 
     if (propertiesFound.length === 0) {
       propertiesFound.push('Nenhum resultado');
+      listSearch += `<li class="list-group-item link-class"><span class="tituloNaLista">${propertiesFound[0]}</span> <br>`;
     } else {
       propertiesFound.sort();
       propertiesFound = propertiesFound.reduce(function (acumulador, nome) {
@@ -416,20 +418,21 @@ $('#search-all-input').keyup( () => {
         }
         return acumulador;
       }, []);
+
+      propertiesFound.forEach( function(element, index) {
+        let layer = getLayerByAttribute(markersCluster,element);
+        listSearch += `<li class="list-group-item link-class"><span class="tituloNaLista">${element}</span> <br>
+        <span class="produtosNaLista">`;
+        layer.feature.properties.produtos.forEach((elementI, indexI) => {
+          if (indexI < 5) {
+            listSearch += `${elementI}, `;
+          }
+        });
+        listSearch += `...</span>`;
+      });
+      highlightForSearch(propertiesFound, markersCluster);
     }
 
-
-    propertiesFound.forEach( function(element, index) {
-      let layer = getLayerByAttribute(markersCluster,element);
-      listSearch += `<li class="list-group-item link-class"> <span class="tituloNaLista">${element}</span> <br>`;
-      layer.feature.properties.produtos.forEach((elementI, indexI) => {
-        if (indexI < 5) {
-          listSearch += `<span class="produtosNaLista">${elementI}</span>, `;
-        }
-      });
-    });
-
-    listSearch += `...`;
     listSearch += `</li>`;
 
     document.getElementById('search-all-results').innerHTML = listSearch;
@@ -437,8 +440,23 @@ $('#search-all-input').keyup( () => {
   }
 });
 
+const highlightForSearch = (array, layerGroup) => {
+  let localLayerGroup = L.layerGroup();
+  array.forEach(element => {
+    localLayerGroup.addLayer(getLayerByAttribute(layerGroup, element));
+  });
+
+    layerGroup.eachLayer(layer => {
+      if (localLayerGroup.hasLayer(layer)) {
+        layer.setIcon(iconMarkers[`${layer.feature.properties.current_tipo}Selected`]);
+      } else {
+        layer.setIcon(iconMarkers[`${layer.feature.properties.current_tipo}`]);
+      }
+    })
+}
+
 $('#search-all-results').on('click', 'li', e => {
-  let inputValue = $('.tituloNaLista').text().trim();
+  let inputValue = $(e.target.childNodes[0]).text().trim();
   $('#search-all-input').val( inputValue );
   moveToPoint( markersCluster, inputValue );
   document.getElementById('search-all-results').innerHTML = '';
