@@ -88,12 +88,13 @@ let mySource = L.WMS.Source.extend({
     }
 });
 
-let source = new mySource("http://localhost:8080/geoserver/the_organicos_ws/wms", {
+//Zona rural
+/*let source = new mySource("http://localhost:8080/geoserver/the_organicos_ws/wms", {
     'transparent': true,
     'format':'image/png'
 });
 let zonaRuralLayer = source.getLayer("zona_rural");
-zonaRuralLayer.addTo(map);
+zonaRuralLayer.addTo(map);*/
 
 map.on('contextmenu', e => e);
 map.scrollWheelZoom.disable();
@@ -147,7 +148,7 @@ L.control.scale( scaleOptions ).addTo( map );
 let bairroEstilo = {
     "color": "#000000",
     "weight": 1.0,
-    "opacity": 0.5,
+    "opacity": 0.0,
     "fillOpacity": 0.0
 };
 
@@ -159,7 +160,7 @@ let bairroDestaqueEstilo = {
 
 const bindBairrosPopUp = (feature, layer ) => {
   let properties = feature.properties;
-  layer.bindPopup(properties.nome_bairro);
+  layer.bindPopup(properties.nome);
   layer.on({
     click: e => {
       let lay = e.target;
@@ -336,107 +337,80 @@ $('#switch-produtor').on('change', e => $(e.currentTarget).is(':checked') ? map.
 $('#switch-comercio').on('change', e => $(e.currentTarget).is(':checked') ? map.addLayer( comercioLayerToControl ) : map.removeLayer( comercioLayerToControl ));
 $('#switch-feira').on('change', e => $(e.currentTarget).is(':checked') ? map.addLayer( feirasLayerToControl ) : map.removeLayer( feirasLayerToControl ));
 
-// Busca por bairro
-$('#search-bairros-input').keyup( () => {
-  let
-  searchField = $('#search-bairros-input').val(),
-  regex = new RegExp( searchField, "i" ),
-  listSearch = '',
-  propertiesFound = [];
-  if ( !searchField ) {
-    document.getElementById('search-bairros-results').innerHTML = '';
-  } else {
-    bairrosLayer.eachLayer( layer => {
-      layer.setStyle(bairroEstilo);
-      if ( layer.feature.properties.nome_bairro.search(regex) != -1 &&  searchField){
-        propertiesFound.push(layer.feature.properties.nome_bairro);
-      }
-     
-    });
-
-    if (propertiesFound.length === 0) {
-      propertiesFound.push('Nenhum resultado');
-    } else {
-      propertiesFound = propertiesFound.reduce(function (acumulador, nome) {
-        if (acumulador.indexOf(nome) == -1) {
-          acumulador.push(nome)
-        }
-        return acumulador;
-      }, []);
-
-      propertiesFound = propertiesFound.slice(0,5);
-      propertiesFound.sort();
-    }
-    propertiesFound.forEach( function(element, index) {
-      listSearch += `<li class="list-group-item link-class"> ${element} </li>`;
-    });
-    document.getElementById('search-bairros-results').innerHTML = listSearch;
-    propertiesFound.length = 0;
-  }
-});
-
-$('#search-bairros-results').on('click', 'li', e => {
-  let inputValue = $(e.currentTarget).text().trim();
-  $('#search-bairros-input').val( inputValue );
-  moveToPolygon( bairrosLayer, inputValue );
-  document.getElementById('search-bairros-results').innerHTML = '';
-});
-
-// Busca por produto / local
+// Busca geral
 $('#search-all-input').keyup( () => {
   let
   searchField = $('#search-all-input').val(),
   regex = new RegExp( searchField, "i" ),
   listSearch = '',
-  propertiesFound = [];
-  highlightForSearch(propertiesFound, markersCluster);
+  placesAndProducts = [],
+  neighborhoods = [],
+  allFound = [];
+  highlightForSearch(placesAndProducts, markersCluster);
   if ( !searchField ) {
     document.getElementById('search-all-results').innerHTML = '';
   } else {
     markersCluster.eachLayer( layer => {
       let properties = layer.feature.properties;
+        //Busca por local
         if ( properties.nome.search(regex) != -1 && searchField){
-          propertiesFound.push(layer.feature.properties.nome);
-        } else {
-            let produtos = properties.produtos;
-            for (let i = produtos.length - 1; i >= 0; i--) {
-              if(produtos[i].search(regex) != -1 && searchField){
-                propertiesFound.push(properties.nome);
-              }
-            }
+          placesAndProducts.push(layer.feature.properties.nome);
+        }
+        //Busca por produto 
+        let produtos = properties.produtos;
+        for (let i = produtos.length - 1; i >= 0; i--) {
+          if(produtos[i].search(regex) != -1 && searchField){
+            placesAndProducts.push(properties.nome);
+          }
         }
     });
+    //Busca por bairro
+    bairrosLayer.eachLayer( layer => {
+      layer.setStyle(bairroEstilo);
+      if ( layer.feature.properties.nome.search(regex) != -1 &&  searchField){
+        neighborhoods.push(layer.feature.properties.nome);
+      }
+    });
 
-    if (propertiesFound.length === 0) {
-      propertiesFound.push('Nenhum resultado');
-      listSearch += `<li class="list-group-item link-class"><span class="tituloNaLista">${propertiesFound[0]}</span> <br>`;
+    //Configuração da listagem
+    allFound = placesAndProducts.concat(neighborhoods);
+
+    if (allFound.length === 0) {
+      listSearch += `<li class="list-group-item">Nenhum resultado`;
     } else {
-      propertiesFound.sort();
-      propertiesFound = propertiesFound.reduce(function (acumulador, nome) {
+      allFound.sort();
+      allFound = allFound.reduce(function (acumulador, nome) {
         if (acumulador.indexOf(nome) == -1) {
           acumulador.push(nome)
         }
         return acumulador;
       }, []);
 
-      propertiesFound.forEach( function(element, index) {
+      allFound = allFound.slice(0,7);
+
+      allFound.forEach( function(element, index) {
         let layer = getLayerByAttribute(markersCluster,element);
-        listSearch += `<li class="list-group-item link-class"><span class="tituloNaLista">${element}</span> <br>
-        <span class="produtosNaLista">`;
-        layer.feature.properties.produtos.forEach((elementI, indexI) => {
-          if (indexI < 5) {
-            listSearch += `${elementI}, `;
-          }
-        });
-        listSearch += `...</span>`;
+        let layerBairro = getLayerByAttribute(bairrosLayer,element);
+        listSearch += `<li class="list-group-item link-class"><span class="tituloNaLista">${element}</span> <br>`;
+        if (!bairrosLayer.hasLayer(layerBairro)) {
+          listSearch += `<span class="produtosNaLista">`;
+          layer.feature.properties.produtos.forEach((elementI, indexI) => {
+            if (indexI < 5) {
+              listSearch += `${elementI}, `;
+            }
+          });
+          listSearch += `...</span>`;
+        }
       });
-      highlightForSearch(propertiesFound, markersCluster);
+      highlightForSearch(placesAndProducts, markersCluster);
     }
 
     listSearch += `</li>`;
 
     document.getElementById('search-all-results').innerHTML = listSearch;
-    propertiesFound.length = 0;
+    placesAndProducts.length = 0;
+    neighborhoods.length = 0;
+    allFound.length = 0;
   }
 });
 
@@ -458,7 +432,12 @@ const highlightForSearch = (array, layerGroup) => {
 $('#search-all-results').on('click', 'li', e => {
   let inputValue = $(e.target.childNodes[0]).text().trim();
   $('#search-all-input').val( inputValue );
-  moveToPoint( markersCluster, inputValue );
+  let layer = getLayerByAttribute(markersCluster,inputValue);
+  if (markersCluster.hasLayer(layer)) {
+    moveToPoint( markersCluster, inputValue );
+  } else {
+    moveToPolygon( bairrosLayer, inputValue );
+  }
   document.getElementById('search-all-results').innerHTML = '';
 });
 
@@ -474,10 +453,10 @@ const getLayerByAttribute = (layerGroup, attribute) => {
 
 const moveToPolygon = (layerToSearch, name ) => {
   layerToSearch.eachLayer( layer => {
-    if ( layer.feature.properties.nome_bairro === name ){
+    if ( layer.feature.properties.nome === name ){
       layer.setStyle(bairroDestaqueEstilo);
       map.setView(layer._latlngs[0][0][0],14);
-      layer.bindPopup(name).openPopup();
+      //layer.bindPopup(name).openPopup();
     }
   })
 }
@@ -498,12 +477,4 @@ const moveToPoint = ( layerToSearch, name ) => {
       });
     }
   });
-};
-
-const sortList = layerToSort => {
-  let arrayTemp = [];
-  layerToSort.eachLayer( layer => {
-    arrayTemp.push( layer.feature.properties.nome );
-  });
-  return arrayTemp.sort();
 };
