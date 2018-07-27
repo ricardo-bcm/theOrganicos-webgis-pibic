@@ -51,7 +51,7 @@ let
 mapboxUrl = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}',
 accessToken = 'pk.eyJ1IjoicmljYXJkb2JjbSIsImEiOiJjajlrMTJkejQxaTUyMzNwZ3cxcnM3MDU2In0.pr0XFTVGiylyl6Sth57t9g',
 attrib = '<a href="http://openstreetmap.org">OpenStreetMap</a> | <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a> | <a href="http://mapbox.com">Mapbox</a>',
-// Layers
+//Layers
 streetsLayer = new L.TileLayer( mapboxUrl, {
   attribution: attrib,
   id: 'mapbox.streets',
@@ -65,11 +65,6 @@ satelliteStreetLayer = new L.TileLayer( mapboxUrl, {
   label: 'Satélite'
 });
 
-let //Cerca geográfica de visualizãção
-northWest = L.latLng( -4.904886794837085, -43.18674087524414 ),
-southEast = L.latLng( -5.332669664718695, -42.37615585327149 ),
-bounds = L.latLngBounds( northWest, southEast );
-
 //Adicão do mapa
 let map = L.map('map', {
   center: [-5.1026, -42.8082],
@@ -80,21 +75,6 @@ let map = L.map('map', {
   closePopupOnClick: true,
   attributionControl: true
 });
-
-
-let mySource = L.WMS.Source.extend({
-    'showFeatureInfo': function(latlng, info) {
-        //Do nothing
-    }
-});
-
-//Zona rural
-/*let source = new mySource("http://localhost:8080/geoserver/the_organicos_ws/wms", {
-    'transparent': true,
-    'format':'image/png'
-});
-let zonaRuralLayer = source.getLayer("zona_rural");
-zonaRuralLayer.addTo(map);*/
 
 map.on('contextmenu', e => e);
 map.scrollWheelZoom.disable();
@@ -154,37 +134,31 @@ let bairroEstilo = {
 
 let bairroDestaqueEstilo = {
     "color": "#7ABA7A",
-    "weight": 5,
-    "opacity": 0.80,
+    "weight": 4.0,
+    "opacity": 0.9,
 };
 
 const bindBairrosPopUp = (feature, layer ) => {
   let properties = feature.properties;
   layer.bindPopup(properties.nome);
-  layer.on({
-    click: e => {
-      let lay = e.target;
-      //lay.setStyle(bairroDestaqueEstilo);
-    }
-  })
 }
 
 const load = callback => {
     $.getJSON('assets/dbscripts/feiras.php', data => {
     let geoJsonFeiraLayer = L.geoJson( data, {
-      pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome_feira}),
+      pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome}),
       onEachFeature: bindPopup
     });
   });
   $.getJSON('assets/dbscripts/unidadesProdutoras.php', data => {
     let geoJsonFeiraLayer = L.geoJson( data, {
-      pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome_unidade_produtora}),
+      pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome}),
       onEachFeature: bindPopup
     });
   });
   $.getJSON('assets/dbscripts/comercios.php', data => {
     let geoJsonFeiraLayer = L.geoJson( data, {
-      pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome_fantasia}),
+      pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome}),
       onEachFeature: bindPopup
     });
   });
@@ -195,7 +169,6 @@ const load = callback => {
     });
 
     bairrosLayer = bairrosGeoJsonLayer;
-
     bairrosLayer.addTo(map);
   });
 
@@ -239,8 +212,8 @@ const bindPopup = ( feature, layer ) => {
   }
 
     description += `<h4>Produtos</h4>`;
-    for (let i = properties.produtos.length - 1; i >= 0; i--) {
-      description += `${properties.produtos[i]} ,`;
+    for (let produto of properties.produtos) {
+      description += `${produto} ,`;
     }
 
   description += `</div>`;
@@ -275,33 +248,6 @@ const addLayerByType = {
   }
 };
 
-const updateEventsOnMarkers = tag => {
-  let 
-  nome = null,
-  icon = null;
-
-  $( tag ).click( e => {
-    nome = $(e.currentTarget).text();
-    moveToPoint( markersCluster, nome );
-  });
-
-  $( tag ).hover( e => {
-    nome = $(e.currentTarget).text();
-    markersCluster.eachLayer( layer => {
-      if ( layer.feature.properties.nome === nome ) {
-        layer.setIcon(iconMarkers[`${layer.feature.properties.current_tipo}Selected`]);
-      }
-    });
-  },
-  () => {
-    markersCluster.eachLayer( layer => {
-      if ( layer.feature.properties.nome === nome ) {
-        layer.setIcon(iconMarkers[layer.feature.properties.current_tipo]);
-      }
-    });
-  });
-};
-
 map.on('layeradd ', e => {
   let layerName = stringLayerName(e.layer);
   if ( layerName ) {
@@ -333,9 +279,12 @@ const stringLayerName = layer =>
   layer === feirasLayerToControl ? 'feirasLayerToControl' : 
   layer === produtoresLayerToControl ? 'produtoresLayerToControl' : '';
 
-$('#switch-produtor').on('change', e => $(e.currentTarget).is(':checked') ? map.addLayer( produtoresLayerToControl ) : map.removeLayer( produtoresLayerToControl ));
-$('#switch-comercio').on('change', e => $(e.currentTarget).is(':checked') ? map.addLayer( comercioLayerToControl ) : map.removeLayer( comercioLayerToControl ));
-$('#switch-feira').on('change', e => $(e.currentTarget).is(':checked') ? map.addLayer( feirasLayerToControl ) : map.removeLayer( feirasLayerToControl ));
+$('#switch-produtor').on('change', e => $(e.currentTarget).is(':checked') 
+  ? map.addLayer( produtoresLayerToControl ) : map.removeLayer( produtoresLayerToControl ));
+$('#switch-comercio').on('change', e => $(e.currentTarget).is(':checked') 
+  ? map.addLayer( comercioLayerToControl ) : map.removeLayer( comercioLayerToControl ));
+$('#switch-feira').on('change', e => $(e.currentTarget).is(':checked') 
+  ? map.addLayer( feirasLayerToControl ) : map.removeLayer( feirasLayerToControl ));
 
 // Busca geral
 $('#search-all-input').keyup( () => {
@@ -357,9 +306,8 @@ $('#search-all-input').keyup( () => {
           placesAndProducts.push(layer.feature.properties.nome);
         }
         //Busca por produto 
-        let produtos = properties.produtos;
-        for (let i = produtos.length - 1; i >= 0; i--) {
-          if(produtos[i].search(regex) != -1 && searchField){
+        for (let produto of properties.produtos) {
+          if(produto.search(regex) != -1 && searchField){
             placesAndProducts.push(properties.nome);
           }
         }
@@ -377,7 +325,8 @@ $('#search-all-input').keyup( () => {
 
     if (allFound.length === 0) {
       listSearch += `<li class="list-group-item">Nenhum resultado`;
-    } else {
+    }
+    else {
       allFound.sort();
       allFound = allFound.reduce(function (acumulador, nome) {
         if (acumulador.indexOf(nome) == -1) {
@@ -388,20 +337,20 @@ $('#search-all-input').keyup( () => {
 
       allFound = allFound.slice(0,7);
 
-      allFound.forEach( function(element, index) {
-        let layer = getLayerByAttribute(markersCluster,element);
-        let layerBairro = getLayerByAttribute(bairrosLayer,element);
-        listSearch += `<li class="list-group-item link-class"><span class="tituloNaLista">${element}</span> <br>`;
+      for (let localName of allFound) {
+        let layer = getLayerByAttribute(markersCluster, localName);
+        let layerBairro = getLayerByAttribute(bairrosLayer, localName);
+        listSearch += `<li class="list-group-item link-class"><span class="tituloNaLista">${localName}</span> <br>`;
         if (!bairrosLayer.hasLayer(layerBairro)) {
           listSearch += `<span class="produtosNaLista">`;
-          layer.feature.properties.produtos.forEach((elementI, indexI) => {
-            if (indexI < 5) {
-              listSearch += `${elementI}, `;
+          layer.feature.properties.produtos.forEach((produtoNome, index) => {
+            if (index < 5) {
+              listSearch += `${produtoNome}, `;
             }
           });
           listSearch += `...</span>`;
         }
-      });
+      }
       highlightForSearch(placesAndProducts, markersCluster);
     }
 
@@ -414,19 +363,18 @@ $('#search-all-input').keyup( () => {
   }
 });
 
-const highlightForSearch = (array, layerGroup) => {
+const highlightForSearch = (nomes, layerGroup) => {
   let localLayerGroup = L.layerGroup();
-  array.forEach(element => {
-    localLayerGroup.addLayer(getLayerByAttribute(layerGroup, element));
+  for (let nome of nomes) {
+    localLayerGroup.addLayer(getLayerByAttribute(layerGroup, nome));
+  }
+  layerGroup.eachLayer(layer => {
+    if (localLayerGroup.hasLayer(layer)) {
+      layer.setIcon(iconMarkers[`${layer.feature.properties.current_tipo}Selected`]);
+    } else {
+      layer.setIcon(iconMarkers[`${layer.feature.properties.current_tipo}`]);
+    }
   });
-
-    layerGroup.eachLayer(layer => {
-      if (localLayerGroup.hasLayer(layer)) {
-        layer.setIcon(iconMarkers[`${layer.feature.properties.current_tipo}Selected`]);
-      } else {
-        layer.setIcon(iconMarkers[`${layer.feature.properties.current_tipo}`]);
-      }
-    })
 }
 
 $('#search-all-results').on('click', 'li', e => {
@@ -441,6 +389,29 @@ $('#search-all-results').on('click', 'li', e => {
   document.getElementById('search-all-results').innerHTML = '';
 });
 
+const getPointsInsideNeighborhood = async nome => {
+  const url = 'assets/dbscripts/querry.php';
+
+  let information = {
+    name : nome
+  }
+
+  let fetchData = {
+    method: "POST",
+    body: JSON.stringify(information)
+  };
+
+  try {
+    let response = await fetch(url, fetchData);
+    if (response.ok) {
+      let jsonResponse = await response.json();
+      return jsonResponse;
+    }
+  } catch(e) {
+    console.log(e);
+  }
+}
+
 const getLayerByAttribute = (layerGroup, attribute) => {
   let layerReturn;
   layerGroup.eachLayer(layer => {
@@ -452,13 +423,17 @@ const getLayerByAttribute = (layerGroup, attribute) => {
 }
 
 const moveToPolygon = (layerToSearch, name ) => {
+  let groupLayer = L.featureGroup();
   layerToSearch.eachLayer( layer => {
     if ( layer.feature.properties.nome === name ){
       layer.setStyle(bairroDestaqueEstilo);
-      map.setView(layer._latlngs[0][0][0],14);
-      //layer.bindPopup(name).openPopup();
+      groupLayer.addLayer(layer);
     }
-  })
+  });
+
+  if (groupLayer.getLayers().length !== 0) {
+    map.fitBounds(groupLayer.getBounds());
+  }
 }
 
 const moveToPoint = ( layerToSearch, name ) => {
