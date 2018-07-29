@@ -150,7 +150,7 @@ const load = callback => {
       onEachFeature: bindPopup
     });
   });
-  $.getJSON('assets/dbscripts/unidadesProdutoras.php', data => {
+  $.getJSON('assets/dbscripts/unidadesprodutoras.php', data => {
     let geoJsonFeiraLayer = L.geoJson( data, {
       pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome}),
       onEachFeature: bindPopup
@@ -186,42 +186,69 @@ const bindPopup = ( feature, layer ) => {
   let
   properties = feature.properties,
   description = '';
-  feature.layer = layer;
 
   if (properties.current_tipo === 'Produtor') {
       description += `
-      <div><strong><h3> ${properties.nome} <h3></strong></div>
-      <div><strong>Telefone:</strong> ${properties.contato_unidade_produtora}</div>
-      <div><strong>Funcionamento:</strong> ${properties.horario_funcionamento_unidade_produtora}</div>
-      <div><strong>Descrição:</strong> ${properties.descricao_unidade_produtora}</div>
-      <div>`;
+      <div class="container-popup">
+        <div class="content-popup">
+          <h4 class="header-popup"> ${properties.nome} </h4>
+          <span class="info-content-text"><span class="info-content">Horário:</span>${properties.horario_funcionamento_unidade_produtora}</span><br>
+          <span class="info-content">Telefone:</span> ${properties.contato_unidade_produtora}
+        </div>`;
   } else if (properties.current_tipo === 'Feira') {
       description += `
-      <div><strong><h3> ${properties.nome} <h3></strong></div>
-      <div><strong>Telefone:</strong> ${properties.contato_feira}</div>
-      <div><strong>Funcionamento:</strong> ${properties.horario_funcionamento}</div>
-      <div><strong>Endereço:</strong> ${properties.endereco_feira}</div>
-      <div>`;
+      <div class="container-popup">
+        <div class="content-popup">
+          <h4 class="header-popup"> ${properties.nome} </h4>
+          <span class="info-content">Endereço:</span> ${properties.endereco_feira}<br>
+          <span class="info-content">Horário:</span> ${properties.horario_funcionamento}<br>
+          <span class="info-content">Telefone:</span> ${properties.contato_feira}
+        </div>`;
   } else if (properties.current_tipo === 'Comercio') {
       description += `
-      <div><strong><h3> ${properties.nome} <h3></strong></div>
-      <div><strong>Telefone:</strong> ${properties.contato_comercio}</div>
-      <div><strong>Cnpf:</strong> ${properties.cnpj_comercio}</div>
-      <div><strong>Descrição:</strong> ${properties.descricao_comercio}</div>
-      <div>`;
+      <div class="container-popup">
+        <div class="content-popup">
+          <h4 class="header-popup"> ${properties.nome} </h4>
+          <span class="info-content-text"><span class="info-content">Telefone:</span> ${properties.contato_comercio}</span><br>
+          <span class="info-content-text"><span class="info-content">CNPJ:</span> ${properties.cnpj_comercio}</span><br>
+          <span class="info-content">Descrição:</span> ${properties.descricao_comercio}
+        </div>`;
   }
 
-    description += `<h4>Produtos</h4>`;
-    for (let produto of properties.produtos) {
-      description += `${produto} ,`;
+  description += `<div class="tipo-popup"><h4>Tipos</h4>`;
+  let tipos = [];
+  for (let produto of properties.produtos) {
+    tipos.push(produto.tipo_produto);
+  }
+
+  tipos = tipos.reduce(function (acumulador, nome) {
+    if (acumulador.indexOf(nome) == -1) {
+      acumulador.push(nome)
     }
+    return acumulador;
+  }, []);
+
+  for (let tipo of tipos) {
+    description += `<span>${tipo} <br></span>`;
+  }
 
   description += `</div>`;
 
-  layer.bindPopup( description );
+  description += `
+        <div class="btna"><a href"#"><button data-toggle="modal" data-target="#locais-modal">Mais</button></a></div>
+            </div>`;
+
+  layer.bindPopup( description , {
+    maxWidth: "auto"
+  });
+
   layer.on({
     mouseover : () => layer.setIcon(iconMarkers[`${properties.current_tipo}Selected`]),
-    mouseout : () => layer.setIcon(iconMarkers[properties.current_tipo])
+    mouseout : () => layer.setIcon(iconMarkers[properties.current_tipo]),
+  });
+
+  layer.on('click', () => {
+    buildModalFromLayer(layer);
   });
 
   addLayerByType[properties.current_tipo]( layer );
@@ -235,6 +262,75 @@ const bindPopup = ( feature, layer ) => {
 };
 
 load(putThemOnMap);
+
+const buildModalFromLayer = layer => {
+  let 
+  header = `<h4 class="header-popup">${layer.feature.properties.nome}</h4>`,
+  body = ``;
+
+  if (layer.feature.properties.imagens.length > 0) {
+    body += `<div id="carouselExampleSlidesOnly" class="carousel slide" data-ride="carousel">
+              <div class="carousel-inner">
+                <div class="carousel-item active">
+                  <img class="d-block w-100" src="${layer.feature.properties.imagens[0]}" alt="First slide">
+                </div>
+                <div class="carousel-item">
+                  <img class="d-block w-100" src="${layer.feature.properties.imagens[1]}" alt="Second slide">
+                </div>
+                <div class="carousel-item">
+                  <img class="d-block w-100" src="${layer.feature.properties.imagens[2]}" alt="Third slide">
+                </div>
+              </div>
+              <a class="carousel-control-prev" href="#carouselExampleSlidesOnly" role="button" data-slide="prev">
+                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                  <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#carouselExampleSlidesOnly" role="button" data-slide="next">
+                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                  <span class="sr-only">Next</span>
+                </a>
+            </div>`;
+  }
+
+  if (layer.feature.properties.current_tipo === 'Produtor') {
+    body += `<span class="info-content">Horário:</span> ${layer.feature.properties.horario_funcionamento_unidade_produtora}<br>
+             <span class="info-content">Telefone:</span> ${layer.feature.properties.contato_unidade_produtora}<br><br>
+             <span class="info-content">Descrição:</span> ${layer.feature.properties.descricao_unidade_produtora}`;
+  } else if (layer.feature.properties.current_tipo === 'Feira') {
+    body += `<span class="info-content">Endereço:</span> ${layer.feature.properties.endereco_feira}<br>
+             <span class="info-content">Horário:</span> ${layer.feature.properties.horario_funcionamento}<br>
+             <span class="info-content">Telefone:</span> ${layer.feature.properties.contato_feira}<br><br>
+             <span class="info-content">Descrição:</span> ${layer.feature.properties.descricao_feira}`;
+  } else if (layer.feature.properties.current_tipo === 'Comercio') {
+    body += `<span class="info-content">Endereço:</span> ${layer.feature.properties.endereco_comercio}<br>
+             <span class="info-content">Horário:</span> ${layer.feature.properties.horario_funcionamento_comercio}<br>
+             <span class="info-content">Telefone:</span> ${layer.feature.properties.contato_comercio}<br><br>
+             <span class="info-content">Descrição:</span> ${layer.feature.properties.descricao_comercio}`;
+  }
+
+
+          body += `<h4>Produtos</h4>`;
+          body += `<table class="table table-striped table-hover">
+          <caption>Lista de produtos</caption>
+            <thead class="thead-dark">
+              <tr>
+                <th scope="col">Nome</th>
+                <th scope="col">Tipo</th>
+              </tr>
+            </thead>
+            <tbody>`;
+          for (let produto of layer.feature.properties.produtos) {
+            body += `<tr>
+                        <td scope="row">${produto.nome_produto}</td>
+                        <td scope="row">${produto.tipo_produto}</td>
+                     </tr>`;
+          }
+          body += `</tbody></table>`;
+
+
+  $('#locais-modal').find('.modal-body').html(body);
+  $('#locais-modal').find('.modal-header').html(header);
+}
 
 const addLayerByType = {
   'Comercio': layer => {
@@ -296,6 +392,8 @@ $('#search-all-input').keyup( () => {
   neighborhoods = [],
   allFound = [];
   highlightForSearch(placesAndProducts, markersCluster);
+   document.getElementById('select-bairro-type').innerHTML = 'Bairro';
+   document.getElementById('list-all-markers').innerHTML = '';
   if ( !searchField ) {
     document.getElementById('search-all-results').innerHTML = '';
   } else {
@@ -307,7 +405,7 @@ $('#search-all-input').keyup( () => {
         }
         //Busca por produto 
         for (let produto of properties.produtos) {
-          if(produto.search(regex) != -1 && searchField){
+          if(produto.nome_produto.search(regex) != -1 && searchField){
             placesAndProducts.push(properties.nome);
           }
         }
@@ -343,9 +441,9 @@ $('#search-all-input').keyup( () => {
         listSearch += `<li class="list-group-item link-class"><span class="tituloNaLista">${localName}</span> <br>`;
         if (!bairrosLayer.hasLayer(layerBairro)) {
           listSearch += `<span class="produtosNaLista">`;
-          layer.feature.properties.produtos.forEach((produtoNome, index) => {
+          layer.feature.properties.produtos.forEach((produto, index) => {
             if (index < 5) {
-              listSearch += `${produtoNome}, `;
+              listSearch += `${produto.nome_produto}, `;
             }
           });
           listSearch += `...</span>`;
@@ -385,12 +483,15 @@ $('#search-all-results').on('click', 'li', e => {
     moveToPoint( markersCluster, inputValue );
   } else {
     moveToPolygon( bairrosLayer, inputValue );
+    getPointsInsideNeighborhood(inputValue).then( response => list(response) );
   }
   document.getElementById('search-all-results').innerHTML = '';
 });
 
 const getPointsInsideNeighborhood = async nome => {
-  const url = 'assets/dbscripts/querry.php';
+  const url = 'assets/dbscripts/locaisporbairro.php';
+
+  document.getElementById('select-bairro-type').innerHTML = nome;
 
   let information = {
     name : nome
@@ -412,6 +513,18 @@ const getPointsInsideNeighborhood = async nome => {
   }
 }
 
+const list = list => {
+  let 
+  text = '',
+  name = [];
+  for (let item of list) {
+    text += `<li class="list-group-item link-class">${item.nome}<br></li>`;
+    name.push(item.nome);
+  }
+  document.getElementById('list-all-markers').innerHTML = text;
+  sycronizeListMarkers(name);
+}
+
 const getLayerByAttribute = (layerGroup, attribute) => {
   let layerReturn;
   layerGroup.eachLayer(layer => {
@@ -421,6 +534,46 @@ const getLayerByAttribute = (layerGroup, attribute) => {
   });
   return layerReturn;
 }
+
+const sycronizeListMarkers = markerNames => {
+  let
+  linePoint = '';
+  document.getElementById('list-all-markers').innerHTML = '';
+
+  for ( let markerName of markerNames ) {
+    linePoint += `<li class="list-group-item list-group-item-action">${markerName}</li>`;
+  }
+  $('#list-all-markers').append( linePoint );
+  updateEventsOnMarkers( '#list-markers li' );
+};
+
+const updateEventsOnMarkers = tag => {
+  let 
+  nome = null,
+  icon = null;
+
+  $( tag ).click( e => {
+    nome = $(e.currentTarget).text();
+    moveToPoint( markersCluster, nome );
+  });
+
+  $( tag ).hover( e => {
+    nome = $(e.currentTarget).text();
+    markersCluster.eachLayer( layer => {
+      if ( layer.feature.properties.nome === nome ) {
+        layer.setIcon(iconMarkers[`${layer.feature.properties.current_tipo}Selected`]);
+      }
+    });
+  },
+  () => {
+    markersCluster.eachLayer( layer => {
+      if ( layer.feature.properties.nome === nome ) {
+        layer.setIcon(iconMarkers[layer.feature.properties.current_tipo]);
+      }
+    });
+  });
+};
+
 
 const moveToPolygon = (layerToSearch, name ) => {
   let groupLayer = L.featureGroup();
@@ -446,6 +599,7 @@ const moveToPoint = ( layerToSearch, name ) => {
       map.flyTo( latlng,14 );
       map.on('zoomend', () => {
         if ( controle ) {
+          buildModalFromLayer(layer);
           layer.openPopup();
           controle = false;
         }
@@ -453,3 +607,55 @@ const moveToPoint = ( layerToSearch, name ) => {
     }
   });
 };
+
+
+
+let myModal = `
+<div class="modal" id="myModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h4 class="modal-title">Modal Heading</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>`;
+
+let 
+header = '<h1>Biblioteca</h1>',
+body = `<div id="carouselExampleSlidesOnly" class="carousel slide" data-ride="carousel">
+          <div class="carousel-inner">
+            <div class="carousel-item active">
+              <img class="d-block w-100" src="assets/images/locais/feira_agoecologica_ufpi-1.png" alt="First slide">
+            </div>
+            <div class="carousel-item">
+              <img class="d-block w-100" src="assets/images/locais/feira_agoecologica_ufpi-2.png" alt="Second slide">
+            </div>
+            <div class="carousel-item">
+              <img class="d-block w-100" src="assets/images/locais/feira_agoecologica_ufpi-11.jpg" alt="Third slide">
+            </div>
+          </div>
+          <a class="carousel-control-prev" href="#carouselExampleSlidesOnly" role="button" data-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#carouselExampleSlidesOnly" role="button" data-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="sr-only">Next</span>
+            </a>
+        </div>`;
+
+
+// $('#locais-modal').find('.modal-body').html(body);
+// $('#locais-modal').find('.modal-header').html(header);
+// $('#locais-modal').modal({show:true});

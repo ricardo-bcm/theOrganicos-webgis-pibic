@@ -15,21 +15,21 @@ foreach ($json->features as $key => $value) {
 	$value->properties->nome = $name;
 
 	$feiraId = filter_var($value->id, FILTER_SANITIZE_NUMBER_INT);	
-	$sql = "SELECT p.nome_produto
+	$sql = "SELECT p.nome_produto, p.tipo_produto
 				FROM produto p , feira_produto fp
 					WHERE fp.feira_id_feira = $feiraId
 					AND fp.produto_id_produto = p.id_produto
 						ORDER BY p.nome_produto ASC";
 	$result = pg_query($connexion, $sql);
 	$produtosAndUnidades = array();
-	while ($row = pg_fetch_array($result)) {
-		$produtosAndUnidades[] = $row[0];
+	while ($row = pg_fetch_assoc($result)) {
+		$produtosAndUnidades[] = $row;
 	}
 
 	$value->properties->produtos = $produtosAndUnidades;
 
 	$sql = "SELECT if.imagem_caminho
-				FROM imagem_feira if , feira f
+				FROM imagem_feira if
 					WHERE if.feira_id = $feiraId";
 	$result = pg_query($connexion, $sql);
 	$images = array();

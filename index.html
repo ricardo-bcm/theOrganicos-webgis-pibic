@@ -55,7 +55,7 @@
       <div class="col-md-3">
         <div class="row">
           <div id="information-wrapper" class="d-flex flex-column flex-nowrap">
-            <span id="select-layers-label" class="d-none d-sm-block">Buscar: Produtos, Locais, Bairros</span>
+            <span id="select-layers-label" class="d-none d-sm-block labels-the-organicos">Buscar: Produtos, Locais, Bairros</span>
             <div id="search-all-div">
               <div class="input-group input-group-to-style">
                 <input type="search" class="form-control" id="search-all-input">
@@ -63,7 +63,7 @@
               </div>
               <ul class="list-group" id="search-all-results"></ul>
             </div><!-- search-all-div -->
-            <span id="select-product-type" class="d-none d-sm-block">Filtros</span>
+            <span id="select-product-type" class="d-none d-sm-block labels-the-organicos">Filtros</span>
             <div id="layers-type" class="d-none d-sm-block">
               <label>Unidade Produtora</label>
               <div class="material-switch pull-right">
@@ -96,9 +96,10 @@
                  <label for="switch-animal" id="switch-animal-label"></label>
                </div>
             </div> <!-- layers-type -->
+            <span id="select-bairro-type" class="d-none d-sm-block labels-the-organicos">Bairro</span>
             <div id="list-markers" class="d-none d-sm-block">
-                          <ul id="list-all-markers" class="list-group"></ul>
-                        </div>
+                <ul id="list-all-markers" class="list-group"></ul>
+            </div>
           </div> <!-- information-wrapper -->
         </div> <!-- row -->
       </div> <!-- col-md-3 -->
@@ -164,7 +165,30 @@
           </div>
         </div>
       </div>
-    </div>  
+    </div>
+    <!-- The Modal -->
+    <div class="modal fade" id="locais-modal">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <h4 class="modal-title"></h4>
+            <button type="button" class="close" data-dismiss="modal"></button>
+          </div>
+
+          <!-- Modal body -->
+          <div class="modal-body"></div>
+
+          <!-- Modal footer -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
   </div> <!-- container-fluid -->
   <script src="node_modules/leaflet/dist/leaflet.js"></script>
   <script src="node_modules/jquery/dist/jquery.min.js"></script>
