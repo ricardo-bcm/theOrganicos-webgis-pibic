@@ -21,12 +21,12 @@ foreach ($json->features as $key => $value) {
 					AND fp.produto_id_produto = p.id_produto
 						ORDER BY p.nome_produto ASC";
 	$result = pg_query($connexion, $sql);
-	$produtosAndUnidades = array();
+	$produtos = array();
 	while ($row = pg_fetch_assoc($result)) {
-		$produtosAndUnidades[] = $row;
+		$produtos[] = $row;
 	}
 
-	$value->properties->produtos = $produtosAndUnidades;
+	$value->properties->produtos = $produtos;
 
 	$sql = "SELECT if.imagem_caminho
 				FROM imagem_feira if

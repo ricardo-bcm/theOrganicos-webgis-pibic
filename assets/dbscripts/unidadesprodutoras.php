@@ -9,7 +9,7 @@ $json = file_get_contents($url);
 $json = json_decode($json);
 
 foreach ($json->features as $key => $value) {
-	$value->properties->current_tipo = "Produtor";
+	$value->properties->current_tipo = "Unidade";
 	$name = $value->properties->nome_unidade_produtora;
 	unset($value->properties->nome_unidade_produtora);
 	$value->properties->nome = $name;
@@ -21,12 +21,12 @@ foreach ($json->features as $key => $value) {
 					AND upp.produto_id_produto = p.id_produto
 						ORDER BY p.nome_produto ASC";
 	$result = pg_query($connexion, $sql);
-	$produtosAndUnidades = array();
+	$produtos = array();
 	while ($row = pg_fetch_assoc($result)) {
-		$produtosAndUnidades[] = $row;
+		$produtos[] = $row;
 	}
 
-	$value->properties->produtos = $produtosAndUnidades;
+	$value->properties->produtos = $produtos;
 
 	$sql = "SELECT iu.imagem_caminho
 				FROM imagem_unidade_produtora iu

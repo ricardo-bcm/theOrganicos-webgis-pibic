@@ -3,12 +3,12 @@
   Email: ricardobcm@outlook.com
 */
 let //Layers para controlar a inserção/remoção dos layers no cluster
-produtoresLayerToControl = L.featureGroup(),
+unidadesLayerToControl = L.featureGroup(),
 feirasLayerToControl = L.featureGroup(),
-comercioLayerToControl = L.featureGroup(),
-produtoresLayer = L.layerGroup(),
+comerciosLayerToControl = L.featureGroup(),
+unidadesLayer = L.layerGroup(),
 feirasLayer = L.layerGroup(),
-comercioLayer = L.layerGroup(),
+comerciosLayer = L.layerGroup(),
 bairrosLayer = L.layerGroup();
 
 //Agrupador de marcadores
@@ -33,18 +33,18 @@ MarkerIcon = L.Icon.extend({
 const
 comercioMarker = new MarkerIcon({ iconUrl: 'assets/images/comercio-marker.png' }),
 feiraMarker = new MarkerIcon({ iconUrl: 'assets/images/feira-marker.png' }),
-produtorMarker = new MarkerIcon({ iconUrl: 'assets/images/produtor-marker.png' }),
+unidadeMarker = new MarkerIcon({ iconUrl: 'assets/images/produtor-marker.png' }),
 comercioMarkerSelected =  new MarkerIcon({ iconUrl: 'assets/images/comercio-marker-selected.png' }),
 feiraMarkerSelected = new MarkerIcon({ iconUrl: 'assets/images/feira-marker-selected.png' }),
-produtorMarkerSelected = new MarkerIcon({ iconUrl: 'assets/images/produtor-marker-selected.png' }),
+unidadeMarkerSelected = new MarkerIcon({ iconUrl: 'assets/images/produtor-marker-selected.png' }),
 
 iconMarkers = {
   'Comercio': comercioMarker,
   'Feira': feiraMarker,
-  'Produtor': produtorMarker,
+  'Unidade': unidadeMarker,
   'ComercioSelected': comercioMarkerSelected,
   'FeiraSelected': feiraMarkerSelected,
-  'ProdutorSelected': produtorMarkerSelected
+  'UnidadeSelected': unidadeMarkerSelected
 };
 
 let
@@ -143,7 +143,7 @@ const bindBairrosPopUp = (feature, layer ) => {
   layer.bindPopup(properties.nome);
 }
 
-const load = callback => {
+const loadLayers = callback => {
     $.getJSON('assets/dbscripts/feiras.php', data => {
     let geoJsonFeiraLayer = L.geoJson( data, {
       pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome}),
@@ -176,19 +176,19 @@ const load = callback => {
 }
 
 const putThemOnMap = () => {
-  produtoresLayerToControl.addTo( map );
+  unidadesLayerToControl.addTo( map );
   feirasLayerToControl.addTo( map );
-  comercioLayerToControl.addTo( map );
+  comerciosLayerToControl.addTo( map );
   markersCluster.addTo( map );
 }
 
 const bindPopup = ( feature, layer ) => {
   let
   properties = feature.properties,
-  description = '';
+  popUpContent = '';
 
-  if (properties.current_tipo === 'Produtor') {
-      description += `
+  if (properties.current_tipo === 'Unidade') {
+      popUpContent += `
       <div class="container-popup">
         <div class="content-popup">
           <h4 class="header-popup"> ${properties.nome} </h4>
@@ -196,7 +196,7 @@ const bindPopup = ( feature, layer ) => {
           <span class="info-content">Telefone:</span> ${properties.contato_unidade_produtora}
         </div>`;
   } else if (properties.current_tipo === 'Feira') {
-      description += `
+      popUpContent += `
       <div class="container-popup">
         <div class="content-popup">
           <h4 class="header-popup"> ${properties.nome} </h4>
@@ -205,7 +205,7 @@ const bindPopup = ( feature, layer ) => {
           <span class="info-content">Telefone:</span> ${properties.contato_feira}
         </div>`;
   } else if (properties.current_tipo === 'Comercio') {
-      description += `
+      popUpContent += `
       <div class="container-popup">
         <div class="content-popup">
           <h4 class="header-popup"> ${properties.nome} </h4>
@@ -215,7 +215,7 @@ const bindPopup = ( feature, layer ) => {
         </div>`;
   }
 
-  description += `<div class="tipo-popup"><h4>Tipos</h4>`;
+  popUpContent += `<div><h4>Tipos</h4>`;
   let tipos = [];
   for (let produto of properties.produtos) {
     tipos.push(produto.tipo_produto);
@@ -229,16 +229,18 @@ const bindPopup = ( feature, layer ) => {
   }, []);
 
   for (let tipo of tipos) {
-    description += `<span>${tipo} <br></span>`;
+    popUpContent += `<span>${tipo} <br></span>`;
   }
 
-  description += `</div>`;
-
-  description += `
-        <div class="btna"><a href"#"><button data-toggle="modal" data-target="#locais-modal">Mais</button></a></div>
+  popUpContent += `</div>
+                   <div class="botao-mais">
+                        <a href"#">
+                            <button data-toggle="modal" data-target="#locais-modal">Mais</button>
+                        </a>
+                   </div>
             </div>`;
 
-  layer.bindPopup( description , {
+  layer.bindPopup( popUpContent , {
     maxWidth: "auto"
   });
 
@@ -253,65 +255,65 @@ const bindPopup = ( feature, layer ) => {
 
   addLayerByType[properties.current_tipo]( layer );
 
-  map.removeLayer( produtoresLayerToControl );
-  map.addLayer( produtoresLayerToControl );
+  map.removeLayer( unidadesLayerToControl );
+  map.addLayer( unidadesLayerToControl );
   map.removeLayer( feirasLayerToControl );
   map.addLayer( feirasLayerToControl );
-  map.removeLayer( comercioLayerToControl );
-  map.addLayer( comercioLayerToControl );
+  map.removeLayer( comerciosLayerToControl );
+  map.addLayer( comerciosLayerToControl );
 };
 
-load(putThemOnMap);
+loadLayers(putThemOnMap);
 
 const buildModalFromLayer = layer => {
   let 
-  header = `<h4 class="header-popup">${layer.feature.properties.nome}</h4>`,
+  properties = layer.feature.properties,
+  header = `<h4 class="header-popup">${properties.nome}</h4>`,
   body = ``;
 
-  if (layer.feature.properties.imagens.length > 0) {
-    body += `<div id="carouselExampleSlidesOnly" class="carousel slide" data-ride="carousel">
+  if (properties.imagens.length > 0) {
+    body += `<div id="carouselLocal" class="carousel slide" data-ride="carousel">
               <div class="carousel-inner">
                 <div class="carousel-item active">
-                  <img class="d-block w-100" src="${layer.feature.properties.imagens[0]}" alt="First slide">
-                </div>
-                <div class="carousel-item">
-                  <img class="d-block w-100" src="${layer.feature.properties.imagens[1]}" alt="Second slide">
-                </div>
-                <div class="carousel-item">
-                  <img class="d-block w-100" src="${layer.feature.properties.imagens[2]}" alt="Third slide">
-                </div>
-              </div>
-              <a class="carousel-control-prev" href="#carouselExampleSlidesOnly" role="button" data-slide="prev">
+                  <img class="d-block w-100" src="${properties.imagens[0]}" alt="${properties.nome}">
+                </div>`;
+    properties.imagens.shift();
+    for (let imagem of properties.imagens) {
+          body += `<div class="carousel-item">
+                    <img class="d-block w-100" src="${imagem}" alt="${properties.nome}">
+                  </div>`;
+    }
+    body += `</div>
+              <a class="carousel-control-prev" href="#carouselLocal" role="button" data-slide="prev">
                   <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                  <span class="sr-only">Previous</span>
+                  <span class="sr-only">Anterior</span>
                 </a>
-                <a class="carousel-control-next" href="#carouselExampleSlidesOnly" role="button" data-slide="next">
+                <a class="carousel-control-next" href="#carouselLocal" role="button" data-slide="next">
                   <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                  <span class="sr-only">Next</span>
+                  <span class="sr-only">Próximo</span>
                 </a>
             </div>`;
   }
 
-  if (layer.feature.properties.current_tipo === 'Produtor') {
-    body += `<span class="info-content">Horário:</span> ${layer.feature.properties.horario_funcionamento_unidade_produtora}<br>
-             <span class="info-content">Telefone:</span> ${layer.feature.properties.contato_unidade_produtora}<br><br>
-             <span class="info-content">Descrição:</span> ${layer.feature.properties.descricao_unidade_produtora}`;
-  } else if (layer.feature.properties.current_tipo === 'Feira') {
-    body += `<span class="info-content">Endereço:</span> ${layer.feature.properties.endereco_feira}<br>
-             <span class="info-content">Horário:</span> ${layer.feature.properties.horario_funcionamento}<br>
-             <span class="info-content">Telefone:</span> ${layer.feature.properties.contato_feira}<br><br>
-             <span class="info-content">Descrição:</span> ${layer.feature.properties.descricao_feira}`;
-  } else if (layer.feature.properties.current_tipo === 'Comercio') {
-    body += `<span class="info-content">Endereço:</span> ${layer.feature.properties.endereco_comercio}<br>
-             <span class="info-content">Horário:</span> ${layer.feature.properties.horario_funcionamento_comercio}<br>
-             <span class="info-content">Telefone:</span> ${layer.feature.properties.contato_comercio}<br><br>
-             <span class="info-content">Descrição:</span> ${layer.feature.properties.descricao_comercio}`;
+  if (properties.current_tipo === 'Unidade') {
+    body += `<span class="info-content">Horário:</span> ${properties.horario_funcionamento_unidade_produtora}<br>
+             <span class="info-content">Telefone:</span> ${properties.contato_unidade_produtora}<br><br>
+             <span class="info-content">Descrição:</span> ${properties.descricao_unidade_produtora}`;
+  } else if (properties.current_tipo === 'Feira') {
+    body += `<span class="info-content">Endereço:</span> ${properties.endereco_feira}<br>
+             <span class="info-content">Horário:</span> ${properties.horario_funcionamento}<br>
+             <span class="info-content">Telefone:</span> ${properties.contato_feira}<br><br>
+             <span class="info-content">Descrição:</span> ${properties.descricao_feira}`;
+  } else if (properties.current_tipo === 'Comercio') {
+    body += `<span class="info-content">Endereço:</span> ${properties.endereco_comercio}<br>
+             <span class="info-content">Horário:</span> ${properties.horario_funcionamento_comercio}<br>
+             <span class="info-content">Telefone:</span> ${properties.contato_comercio}<br><br>
+             <span class="info-content">Descrição:</span> ${properties.descricao_comercio}`;
   }
 
-
-          body += `<h4>Produtos</h4>`;
-          body += `<table class="table table-striped table-hover">
-          <caption>Lista de produtos</caption>
+  body += `<h4>Produtos</h4>
+          <table class="table table-striped table-hover">
+            <caption>Lista de produtos</caption>
             <thead class="thead-dark">
               <tr>
                 <th scope="col">Nome</th>
@@ -319,14 +321,14 @@ const buildModalFromLayer = layer => {
               </tr>
             </thead>
             <tbody>`;
-          for (let produto of layer.feature.properties.produtos) {
-            body += `<tr>
-                        <td scope="row">${produto.nome_produto}</td>
-                        <td scope="row">${produto.tipo_produto}</td>
-                     </tr>`;
-          }
-          body += `</tbody></table>`;
-
+  for (let produto of properties.produtos) {
+    body += `<tr>
+                <td scope="row">${produto.nome_produto}</td>
+                <td scope="row">${produto.tipo_produto}</td>
+             </tr>`;
+  }
+  body += `</tbody>
+          </table>`;
 
   $('#locais-modal').find('.modal-body').html(body);
   $('#locais-modal').find('.modal-header').html(header);
@@ -334,13 +336,13 @@ const buildModalFromLayer = layer => {
 
 const addLayerByType = {
   'Comercio': layer => {
-    comercioLayer.addLayer( layer );
+    comerciosLayer.addLayer( layer );
   },
   'Feira': layer => {
     feirasLayer.addLayer( layer );
   },
-  'Produtor': layer => {
-    produtoresLayer.addLayer( layer );
+  'Unidade': layer => {
+    unidadesLayer.addLayer( layer );
   }
 };
 
@@ -359,26 +361,26 @@ map.on('layerremove', e => {
 });
 
 const addRemoveLayerOfCluster = {
-  comercioLayerToControl: isToAdd => {
-    isToAdd ? markersCluster.addLayer( comercioLayer ) : markersCluster.removeLayer( comercioLayer );
+  comerciosLayerToControl: isToAdd => {
+    isToAdd ? markersCluster.addLayer( comerciosLayer ) : markersCluster.removeLayer( comerciosLayer );
   },
   feirasLayerToControl: isToAdd => {
     isToAdd ? markersCluster.addLayer( feirasLayer ) : markersCluster.removeLayer( feirasLayer );
   },
-  produtoresLayerToControl: isToAdd => {
-    isToAdd ? markersCluster.addLayer( produtoresLayer ) : markersCluster.removeLayer( produtoresLayer );
+  unidadesLayerToControl: isToAdd => {
+    isToAdd ? markersCluster.addLayer( unidadesLayer ) : markersCluster.removeLayer( unidadesLayer );
   }
 };
 
 const stringLayerName = layer =>
-  layer === comercioLayerToControl ? 'comercioLayerToControl' :
+  layer === comerciosLayerToControl ? 'comerciosLayerToControl' :
   layer === feirasLayerToControl ? 'feirasLayerToControl' : 
-  layer === produtoresLayerToControl ? 'produtoresLayerToControl' : '';
+  layer === unidadesLayerToControl ? 'unidadesLayerToControl' : '';
 
 $('#switch-produtor').on('change', e => $(e.currentTarget).is(':checked') 
-  ? map.addLayer( produtoresLayerToControl ) : map.removeLayer( produtoresLayerToControl ));
+  ? map.addLayer( unidadesLayerToControl ) : map.removeLayer( unidadesLayerToControl ));
 $('#switch-comercio').on('change', e => $(e.currentTarget).is(':checked') 
-  ? map.addLayer( comercioLayerToControl ) : map.removeLayer( comercioLayerToControl ));
+  ? map.addLayer( comerciosLayerToControl ) : map.removeLayer( comerciosLayerToControl ));
 $('#switch-feira').on('change', e => $(e.currentTarget).is(':checked') 
   ? map.addLayer( feirasLayerToControl ) : map.removeLayer( feirasLayerToControl ));
 
@@ -392,23 +394,23 @@ $('#search-all-input').keyup( () => {
   neighborhoods = [],
   allFound = [];
   highlightForSearch(placesAndProducts, markersCluster);
-   document.getElementById('select-bairro-type').innerHTML = 'Bairro';
-   document.getElementById('list-all-markers').innerHTML = '';
+  document.getElementById('select-bairro-type').innerHTML = 'Bairro';
+  document.getElementById('list-all-markers').innerHTML = '';
   if ( !searchField ) {
     document.getElementById('search-all-results').innerHTML = '';
   } else {
     markersCluster.eachLayer( layer => {
       let properties = layer.feature.properties;
-        //Busca por local
-        if ( properties.nome.search(regex) != -1 && searchField){
-          placesAndProducts.push(layer.feature.properties.nome);
+      //Busca por local
+      if ( properties.nome.search(regex) != -1 && searchField){
+        placesAndProducts.push(layer.feature.properties.nome);
+      }
+      //Busca por produto 
+      for (let produto of properties.produtos) {
+        if(produto.nome_produto.search(regex) != -1 && searchField){
+          placesAndProducts.push(properties.nome);
         }
-        //Busca por produto 
-        for (let produto of properties.produtos) {
-          if(produto.nome_produto.search(regex) != -1 && searchField){
-            placesAndProducts.push(properties.nome);
-          }
-        }
+      }
     });
     //Busca por bairro
     bairrosLayer.eachLayer( layer => {
@@ -417,7 +419,6 @@ $('#search-all-input').keyup( () => {
         neighborhoods.push(layer.feature.properties.nome);
       }
     });
-
     //Configuração da listagem
     allFound = placesAndProducts.concat(neighborhoods);
 
@@ -451,9 +452,7 @@ $('#search-all-input').keyup( () => {
       }
       highlightForSearch(placesAndProducts, markersCluster);
     }
-
     listSearch += `</li>`;
-
     document.getElementById('search-all-results').innerHTML = listSearch;
     placesAndProducts.length = 0;
     neighborhoods.length = 0;
@@ -574,7 +573,6 @@ const updateEventsOnMarkers = tag => {
   });
 };
 
-
 const moveToPolygon = (layerToSearch, name ) => {
   let groupLayer = L.featureGroup();
   layerToSearch.eachLayer( layer => {
@@ -607,55 +605,3 @@ const moveToPoint = ( layerToSearch, name ) => {
     }
   });
 };
-
-
-
-let myModal = `
-<div class="modal" id="myModal">
-  <div class="modal-dialog">
-    <div class="modal-content">
-
-      <div class="modal-header">
-        <h4 class="modal-title">Modal Heading</h4>
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-      </div>
-
-      <div class="modal-body">
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-      </div>
-
-    </div>
-  </div>
-</div>`;
-
-let 
-header = '<h1>Biblioteca</h1>',
-body = `<div id="carouselExampleSlidesOnly" class="carousel slide" data-ride="carousel">
-          <div class="carousel-inner">
-            <div class="carousel-item active">
-              <img class="d-block w-100" src="assets/images/locais/feira_agoecologica_ufpi-1.png" alt="First slide">
-            </div>
-            <div class="carousel-item">
-              <img class="d-block w-100" src="assets/images/locais/feira_agoecologica_ufpi-2.png" alt="Second slide">
-            </div>
-            <div class="carousel-item">
-              <img class="d-block w-100" src="assets/images/locais/feira_agoecologica_ufpi-11.jpg" alt="Third slide">
-            </div>
-          </div>
-          <a class="carousel-control-prev" href="#carouselExampleSlidesOnly" role="button" data-slide="prev">
-              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-              <span class="sr-only">Previous</span>
-            </a>
-            <a class="carousel-control-next" href="#carouselExampleSlidesOnly" role="button" data-slide="next">
-              <span class="carousel-control-next-icon" aria-hidden="true"></span>
-              <span class="sr-only">Next</span>
-            </a>
-        </div>`;
-
-
-// $('#locais-modal').find('.modal-body').html(body);
-// $('#locais-modal').find('.modal-header').html(header);
-// $('#locais-modal').modal({show:true});
