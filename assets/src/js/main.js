@@ -14,7 +14,7 @@ bairrosLayer = L.layerGroup();
 //Agrupador de marcadores
 let
 markersCluster = L.markerClusterGroup({
-  disableClusteringAtZoom: 13,
+  disableClusteringAtZoom: 10,
   showCoverageOnHover: true,
   spiderfyOnMaxZoom: false
 });
@@ -67,9 +67,9 @@ satelliteStreetLayer = new L.TileLayer( mapboxUrl, {
 
 //Adicão do mapa
 let map = L.map('map', {
-  center: [-5.1026, -42.8082],
-  zoom: 11,
-  minZoom: 11,
+  center: [-5.1894, -42.8081],
+  zoom: 10,
+  minZoom: 10,
   maxZoom: 18,
   zoomControl: false,
   closePopupOnClick: true,
@@ -77,10 +77,23 @@ let map = L.map('map', {
 });
 
 map.on('contextmenu', e => e);
-map.scrollWheelZoom.disable();
 
 // Controles
 L.Control.zoomHome().addTo( map );
+
+let mySource = L.WMS.Source.extend({
+    'showFeatureInfo': function(latlng, info) {
+        //Do nothing
+    }
+});
+
+let source = new mySource("http://localhost:8080/geoserver/the_organicos_ws/wms", {
+    'transparent': true,
+    'format':'image/png'
+});
+let zonaRuralLayer = source.getLayer("teresina");
+zonaRuralLayer.addTo(map);
+
 
 let //Minimapa
 streetsMinimapLayer = new L.TileLayer( mapboxUrl, {
@@ -193,8 +206,27 @@ const bindPopup = ( feature, layer ) => {
         <div class="content-popup">
           <h4 class="header-popup"> ${properties.nome} </h4>
           <span class="info-content-text"><span class="info-content">Horário:</span>${properties.horario_funcionamento_unidade_produtora}</span><br>
-          <span class="info-content">Telefone:</span> ${properties.contato_unidade_produtora}
-        </div>`;
+          <span class="info-content">Telefone:</span> ${properties.contato_unidade_produtora}<br>
+          <span class="info-content">Descricao:</span> ${properties.descricao_unidade_produtora}<br>`;
+            let tipos = [];
+            for (let produto of properties.produtos) {
+              tipos.push(produto.tipo_produto);
+            }
+
+            tipos = tipos.reduce(function (acumulador, nome) {
+              if (acumulador.indexOf(nome) == -1) {
+                acumulador.push(nome)
+              }
+              return acumulador;
+            }, []);
+
+            popUpContent += `<span class="info-content">Produção: </span>`;
+
+            for (let tipo of tipos) {
+               popUpContent += `<span>${tipo}, </span>`;
+             }
+
+          popUpContent += `</div>`;
   } else if (properties.current_tipo === 'Feira') {
       popUpContent += `
       <div class="container-popup">
@@ -202,8 +234,27 @@ const bindPopup = ( feature, layer ) => {
           <h4 class="header-popup"> ${properties.nome} </h4>
           <span class="info-content">Endereço:</span> ${properties.endereco_feira}<br>
           <span class="info-content">Horário:</span> ${properties.horario_funcionamento}<br>
-          <span class="info-content">Telefone:</span> ${properties.contato_feira}
-        </div>`;
+          <span class="info-content">Telefone:</span> ${properties.contato_feira}<br>
+          <span class="info-content">Descricao:</span> ${properties.descricao_feira}<br>`;
+          let tipos = [];
+          for (let produto of properties.produtos) {
+            tipos.push(produto.tipo_produto);
+          }
+
+          tipos = tipos.reduce(function (acumulador, nome) {
+            if (acumulador.indexOf(nome) == -1) {
+              acumulador.push(nome)
+            }
+            return acumulador;
+          }, []);
+
+          popUpContent += `<span class="info-content">Produtos disponíveis: </span>`;
+
+          for (let tipo of tipos) {
+             popUpContent += `<span>${tipo}, </span>`;
+           }
+
+        popUpContent += `</div>`;
   } else if (properties.current_tipo === 'Comercio') {
       popUpContent += `
       <div class="container-popup">
@@ -213,23 +264,6 @@ const bindPopup = ( feature, layer ) => {
           <span class="info-content-text"><span class="info-content">CNPJ:</span> ${properties.cnpj_comercio}</span><br>
           <span class="info-content">Descrição:</span> ${properties.descricao_comercio}
         </div>`;
-  }
-
-  popUpContent += `<div><h4>Tipos</h4>`;
-  let tipos = [];
-  for (let produto of properties.produtos) {
-    tipos.push(produto.tipo_produto);
-  }
-
-  tipos = tipos.reduce(function (acumulador, nome) {
-    if (acumulador.indexOf(nome) == -1) {
-      acumulador.push(nome)
-    }
-    return acumulador;
-  }, []);
-
-  for (let tipo of tipos) {
-    popUpContent += `<span>${tipo} <br></span>`;
   }
 
   popUpContent += `</div>

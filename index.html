@@ -65,6 +65,7 @@
             </div><!-- search-all-div -->
             <span id="select-product-type" class="d-none d-sm-block labels-the-organicos">Filtros</span>
             <div id="layers-type" class="d-none d-sm-block">
+              <span class="d-none d-sm-block inside-filter">Locais</span>
               <label>Unidade Produtora</label>
               <div class="material-switch pull-right">
                 <input id="switch-produtor" type="checkbox" checked>
@@ -79,7 +80,10 @@
               <div class="material-switch pull-right">
                 <input id="switch-feira" type="checkbox" checked>
                 <label for="switch-feira" id="switch-feira-label"></label>
-              </div><br>
+              </div>
+            </div>
+            <div id="products-select" class="d-none d-sm-block">
+              <span class="d-none d-sm-block inside-filter">Produtos</span>
                <label>Hortícolas</label>
                <div class="material-switch pull-right">
                  <input id="switch-horticolas" type="checkbox" checked>
@@ -116,10 +120,23 @@
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
           </div>
           <div class="modal-body">
-            <div class="conteiner-fluid">
-              <p>O TheOrganicos é Lorem ipsum dolor sit amet, consectetur adipiscing elit. In malesuada tellus vitae hendrerit facilisis. In hac habitasse platea dictumst. Donec nec diam porttitor lorem egestas facilisis. Mauris porta tellus in tortor elementum ultricies ullamcorper sit amet odio. Vestibulum sagittis ex eu erat lacinia lobortis. Nulla eget faucibus ipsum. Suspendisse consectetur tellus et tristique molestie. Mauris ornare, lectus interdum lacinia viverra, nunc turpis posuere nibh, a ullamcorper nunc dolor non erat. Pellentesque orci mauris, consectetur sed finibus et, bibendum a eros. Quisque vel dignissim massa, a tempor nisi. Proin egestas eros nec porttitor mattis. Aliquam ac risus at dui iaculis blandit sit amet a ex. Donec viverra metus ut fermentum interdum. Nullam vitae elementum augue.</p>
+            <div class="conteiner-fluid" id="about-div">
+              <p>A aplicação TheOrgânicos é um sistema de informação geográfica voltada para web com funcionalidade de busca da localização das unidades produtoras e feiras de base agroecológica do município de Teresina, idealizada por alunos e professores do Instituto Federal do Piauí – IFPI, com o objetivo de estimular a alimentação saudável no município de Teresina e mostrar que os produtos agroecológicos podem ser mais acessíveis aos consumidores.</p>
+
+              <p>O mapa visa encurtar o caminho do consumidor até o produtor para ampliar o acesso aos alimentos de base agroecológica. Para fomentar os canais alternativos de comercialização, o mapa localiza:</p>
+
+              <p><img src="assets/images/produtor-marker.png" align="left"> <span class="p-text">Unidades produtoras: Unidades que produzem alimentos de base agroecológica do município de Teresina.</span></p><br>
+
+              <p><img src="assets/images/feira-marker.png" align="left"> <span class="p-text">Feiras de base agroecológica: Feiras são espaços de comercialização como alternativa de comprar direta com o produtor, pois diminuem intermediários no processo e consequentemente o preço do produto. Localizando todas as feiras de base agroecológica do município de Teresina.</span></p>
+
+              <p><img src="assets/images/comercio-marker.png"  align="left"> <span class="p-text">Comércios parceiros: Parceria entre o comercio intermediário com o produtor na venda dos produtos agroecológicos. Essa relação deve ser transparente e justa, com preços que beneficiem ambas as partes e o cliente</span></p>
               <h4>Em parceria com</h4>
-              <a href="http://libra.ifpi.edu.br" target="newtab"><img src="assets/images/ifpi-logo.svg" alt="http://libra.ifpi.edu.br"></a>
+              <a href="http://libra.ifpi.edu.br" target="newtab">
+                <img src="assets/images/ifpi-logo.svg" alt="http://libra.ifpi.edu.br">
+              </a>
+              <a href="https://www.facebook.com/SementesdeCultura/" target="newtab">
+                <img src="assets/images/sementes_da_cultura_logo.jpg" alt="Sementes da Cultura Logo">
+              </a>
             </div>
           </div>
           <div class="modal-footer">

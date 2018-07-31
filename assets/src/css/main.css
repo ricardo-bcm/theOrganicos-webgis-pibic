@@ -108,6 +108,7 @@ body {
 }
 
 #products-select {
+  margin-top: 5px;
   padding: 10px;
   border: 1px solid #CED4DA;
   border-radius: 5px;
@@ -179,19 +180,19 @@ label {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 12px;
     position: absolute;
-    bottom: -13px;
-    right: -20px;
+    bottom: 0;
+    right: -7px;
 }
 
 .botao-mais a {
     background: #7ABA7A;
     border: none;
     display: inline-block;
-    height: 40px;
+    height: 27px;
     line-height: 28px;
     position: relative;
     text-decoration: none;
-    width: 100px
+    width: 74px
 }
 
 .botao-mais a:before{
@@ -199,15 +200,15 @@ label {
     border: none;
     content: '';
     display: block;
-    height: 33px;
-    left: 83px;
+    height: 26px;
+    left: 58px;
     position: absolute;
-    top: 4px;
+    top: 0;
     -moz-transform: rotate(45deg);
     -webkit-transform: rotate(45deg);
     -o-transform: rotate(45deg);
     transform: rotate(45deg);
-    width: 31px;
+    width: 26px;
 }
 
 .botao-mais a button {
@@ -215,9 +216,9 @@ label {
     background: none;
     border: none;
     position: relative;
-    width: 110px;
-    height: 40px;
-    font-size: 20px;
+    width: 78px;
+    height: 20px;
+    font-size: 17px;
     font-family: 'Manteka'
 }
 
@@ -461,4 +462,14 @@ a.leaflet-control-zoomhome-in, a.leaflet-control-zoomhome-out, a.leaflet-control
     color: #fff;
     margin: 10px 0 0 0;
   }
+}
+#about-div img {
+  margin-right: 10px;
+}
+
+.inside-filter {
+ text-align: center;
+ font-family: "Manteka";
+ font-size: 13px;
+ font-weight: bold;
 }

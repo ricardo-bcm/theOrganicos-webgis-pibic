@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <title>Incluir ponto</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="assets/src/css/incluir.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-md">
+      <a class="navbar-brand" id="title-navbar" href="#">
+        <img src="assets/images/logo.png" height="60" width="60" alt="">
+        TheOrgânicos
+      </a>
+    </nav>
+    <div class="container" id="container-form">
+        <nav>
+          <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Feira</a>
+            <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Unidade Produtora</a>
+            <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Comercio</a>
+          </div>
+        </nav>
+        <div class="tab-content" id="nav-tabContent">
+          <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+              <form id="feira-form">
+                <div class="form-group row">
+                  <label for="nome" class="col-4 col-form-label">Nome</label> 
+                  <div class="col-8">
+                    <input id="nome" name="nome" placeholder="Nome" type="text" class="form-control here" required="required">
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="endereço" class="col-4 col-form-label">Endereço</label> 
+                  <div class="col-8">
+                    <input id="endereco" name="endereco" placeholder="Endereço" type="text" class="form-control here">
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="horario" class="col-4 col-form-label">Horário</label> 
+                  <div class="col-8">
+                    <input id="horario" name="horario" placeholder="Funcionamento" type="text" class="form-control here">
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="contato" class="col-4 col-form-label">Contato</label> 
+                  <div class="col-8">
+                    <input id="contato" name="contato" placeholder="Contato" type="text" class="form-control here">
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="longitude" class="col-4 col-form-label">Longitude</label> 
+                  <div class="col-8">
+                    <input id="longitude" name="longitude" placeholder="-42.000000" type="text" class="form-control here" required="required">
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="latitude" class="col-4 col-form-label">Latitude</label> 
+                  <div class="col-8">
+                    <input id="latitude" name="latitude" placeholder="-5.0000000" type="text" class="form-control here" required="required">
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="descricao" class="col-4 col-form-label">Descrição</label> 
+                  <div class="col-8">
+                    <textarea id="descricao" name="descricao" cols="40" rows="5" class="form-control"></textarea>
+                  </div>
+                </div> 
+                <div class="form-group row">
+                  <div class="offset-4 col-8">
+                    <button name="submit" type="submit" id="btn-feira" class="btn btn-primary">Submit</button>
+                  </div>
+                </div>
+              </form>
+          </div>
+          <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">...</div>
+          <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">...</div>
+        </div>
+    </div>
+    <script src="node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/src/js/incluir.js"></script>
+</body>
+</html>
