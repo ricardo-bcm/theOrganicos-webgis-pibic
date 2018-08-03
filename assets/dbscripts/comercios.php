@@ -22,11 +22,17 @@ foreach ($json->features as $key => $value) {
 						ORDER BY p.nome_produto ASC";
 	$result = pg_query($connexion, $sql);
 	$produtos = array();
+	$produtosTipo = array();
 	while ($row = pg_fetch_assoc($result)) {
 		$produtos[] = $row;
+		$produtosTipo[] = $row['tipo_produto'];
 	}
 
+	$produtosTipo = array_unique($produtosTipo);
+	$newProdutosTipo = array_values($produtosTipo);
+
 	$value->properties->produtos = $produtos;
+	$value->properties->tipos_produtos = $newProdutosTipo;
 
 	$sql = "SELECT ic.imagem_caminho
 				FROM imagem_comercio ic

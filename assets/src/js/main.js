@@ -9,7 +9,8 @@ comerciosLayerToControl = L.featureGroup(),
 unidadesLayer = L.layerGroup(),
 feirasLayer = L.layerGroup(),
 comerciosLayer = L.layerGroup(),
-bairrosLayer = L.layerGroup();
+bairrosLayer = L.layerGroup(),
+searchLayer = L.featureGroup();
 
 //Agrupador de marcadores
 let
@@ -162,18 +163,21 @@ const loadLayers = callback => {
       pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome}),
       onEachFeature: bindPopup
     });
+    feirasLayerToControl.addTo( map );
   });
   $.getJSON('assets/dbscripts/unidadesprodutoras.php', data => {
     let geoJsonFeiraLayer = L.geoJson( data, {
       pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome}),
       onEachFeature: bindPopup
     });
+    unidadesLayerToControl.addTo( map );
   });
   $.getJSON('assets/dbscripts/comercios.php', data => {
     let geoJsonFeiraLayer = L.geoJson( data, {
       pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome}),
       onEachFeature: bindPopup
     });
+    comerciosLayerToControl.addTo( map );
   });
   $.getJSON('assets/dbscripts/bairros.php', data => {
     let bairrosGeoJsonLayer = L.geoJson( data , {
@@ -189,9 +193,6 @@ const loadLayers = callback => {
 }
 
 const putThemOnMap = () => {
-  unidadesLayerToControl.addTo( map );
-  feirasLayerToControl.addTo( map );
-  comerciosLayerToControl.addTo( map );
   markersCluster.addTo( map );
 }
 
@@ -288,13 +289,7 @@ const bindPopup = ( feature, layer ) => {
   });
 
   addLayerByType[properties.current_tipo]( layer );
-
-  map.removeLayer( unidadesLayerToControl );
-  map.addLayer( unidadesLayerToControl );
-  map.removeLayer( feirasLayerToControl );
-  map.addLayer( feirasLayerToControl );
-  map.removeLayer( comerciosLayerToControl );
-  map.addLayer( comerciosLayerToControl );
+  searchLayer.addLayer(layer);
 };
 
 loadLayers(putThemOnMap);
@@ -311,8 +306,8 @@ const buildModalFromLayer = layer => {
                 <div class="carousel-item active">
                   <img class="d-block w-100" src="${properties.imagens[0]}" alt="${properties.nome}">
                 </div>`;
-    properties.imagens.shift();
-    for (let imagem of properties.imagens) {
+    let imagensTemp = properties.imagens.slice(1);
+    for (let imagem of imagensTemp) {
           body += `<div class="carousel-item">
                     <img class="d-block w-100" src="${imagem}" alt="${properties.nome}">
                   </div>`;
@@ -417,6 +412,31 @@ $('#switch-comercio').on('change', e => $(e.currentTarget).is(':checked')
   ? map.addLayer( comerciosLayerToControl ) : map.removeLayer( comerciosLayerToControl ));
 $('#switch-feira').on('change', e => $(e.currentTarget).is(':checked') 
   ? map.addLayer( feirasLayerToControl ) : map.removeLayer( feirasLayerToControl ));
+$('#switch-horticolas').on('change', e => { layersForType() });
+$('#switch-frutiferas').on('change', e => { layersForType() });
+$('#switch-animal').on('change', e => { layersForType() });
+
+const layersForType = () => {
+  let 
+  tipoEstado = {
+    'HORTICOLAS' : $('#switch-horticolas').is(':checked'),
+    'FRUTIFERAS' : $('#switch-frutiferas').is(':checked'),
+    'PRODUCAO ANIMAL': $('#switch-animal').is(':checked')
+  }
+
+    searchLayer.eachLayer( layer => {
+      let tipos = layer.feature.properties.tipos_produtos,
+      cont = 0;
+      for (let tipoL of tipos) {
+        cont += tipoEstado[tipoL];
+      }
+      if (cont < 1) {
+        markersCluster.removeLayer(layer);
+      } else if (cont > 0 && !markersCluster.hasLayer(layer)) {
+        markersCluster.addLayer(layer);
+      }
+    })
+}
 
 // Busca geral
 $('#search-all-input').keyup( () => {
