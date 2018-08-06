@@ -19,7 +19,7 @@ foreach ($json->features as $key => $value) {
 				FROM produto p , feira_produto fp
 					WHERE fp.feira_id_feira = $feiraId
 					AND fp.produto_id_produto = p.id_produto
-						ORDER BY p.nome_produto ASC";
+						ORDER BY p.tipo_produto ASC";
 	$result = pg_query($connexion, $sql);
 	$produtos = array();
 	$produtosTipo = array();

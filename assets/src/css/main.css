@@ -85,7 +85,7 @@ body {
   background-color: var(--main-color);
 }
 
-/*Busca por lugares/produtos*/
+/*Busca*/
 #search-all-div {
   padding:0;
 }
@@ -177,7 +177,6 @@ label {
 
 .botao-mais {
     background: transparent;
-    font-family: Arial, Helvetica, sans-serif;
     font-size: 12px;
     position: absolute;
     bottom: 0;
@@ -346,7 +345,7 @@ label {
 
 /*Leaflet my styles*/
 .leaflet-popup-content-wrapper {
-  border-radius: 3px; 
+  border-radius: 3px; s
   box-shadow: 0 0 0 0;
   margin:0;
   padding: 0;
@@ -463,6 +462,7 @@ a.leaflet-control-zoomhome-in, a.leaflet-control-zoomhome-out, a.leaflet-control
     margin: 10px 0 0 0;
   }
 }
+
 #about-div img {
   margin-right: 10px;
 }

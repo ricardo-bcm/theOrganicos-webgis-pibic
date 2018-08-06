@@ -100,8 +100,8 @@ let //Minimapa
 streetsMinimapLayer = new L.TileLayer( mapboxUrl, {
   attribution: attrib,
   id: 'mapbox.streets',
-  minZoom: 7,
-  maxZoom: 13,
+  minZoom: 6,
+  maxZoom: 15,
   accessToken: accessToken
 }),
 miniMapOptions = {
@@ -206,7 +206,7 @@ const bindPopup = ( feature, layer ) => {
       <div class="container-popup">
         <div class="content-popup">
           <h4 class="header-popup"> ${properties.nome} </h4>
-          <span class="info-content-text"><span class="info-content">Horário:</span>${properties.horario_funcionamento_unidade_produtora}</span><br>
+          <span class="info-content-text"><span class="info-content">Horário:</span> ${properties.horario_funcionamento_unidade_produtora}</span><br>
           <span class="info-content">Telefone:</span> ${properties.contato_unidade_produtora}<br>
           <span class="info-content">Descricao:</span> ${properties.descricao_unidade_produtora}<br>`;
             let tipos = [];
@@ -221,11 +221,13 @@ const bindPopup = ( feature, layer ) => {
               return acumulador;
             }, []);
 
-            popUpContent += `<span class="info-content">Produção: </span>`;
+            popUpContent += `<span class="info-content">Produção:</span>`;
 
             for (let tipo of tipos) {
-               popUpContent += `<span>${tipo}, </span>`;
-             }
+              popUpContent += `<span> ${tipo},`;
+            }
+            popUpContent = popUpContent.slice(0,-1);
+            popUpContent += `</span>`;
 
           popUpContent += `</div>`;
   } else if (properties.current_tipo === 'Feira') {
@@ -252,8 +254,10 @@ const bindPopup = ( feature, layer ) => {
           popUpContent += `<span class="info-content">Produtos disponíveis: </span>`;
 
           for (let tipo of tipos) {
-             popUpContent += `<span>${tipo}, </span>`;
-           }
+            popUpContent += `<span> ${tipo},`;
+          }
+          popUpContent = popUpContent.slice(0,-1);
+          popUpContent += `</span>`;
 
         popUpContent += `</div>`;
   } else if (properties.current_tipo === 'Comercio') {
@@ -263,8 +267,28 @@ const bindPopup = ( feature, layer ) => {
           <h4 class="header-popup"> ${properties.nome} </h4>
           <span class="info-content-text"><span class="info-content">Telefone:</span> ${properties.contato_comercio}</span><br>
           <span class="info-content-text"><span class="info-content">CNPJ:</span> ${properties.cnpj_comercio}</span><br>
-          <span class="info-content">Descrição:</span> ${properties.descricao_comercio}
-        </div>`;
+          <span class="info-content">Descrição:</span> ${properties.descricao_comercio}<br>`;
+            let tipos = [];
+            for (let produto of properties.produtos) {
+              tipos.push(produto.tipo_produto);
+            }
+
+            tipos = tipos.reduce(function (acumulador, nome) {
+              if (acumulador.indexOf(nome) == -1) {
+                acumulador.push(nome)
+              }
+              return acumulador;
+            }, []);
+
+            popUpContent += `<span class="info-content">Produtos disponíveis: </span>`;
+
+            for (let tipo of tipos) {
+              popUpContent += `<span> ${tipo},`;
+            }
+            popUpContent = popUpContent.slice(0,-1);
+            popUpContent += `</span>`;
+
+          popUpContent += `</div>`;
   }
 
   popUpContent += `</div>
@@ -448,6 +472,9 @@ $('#search-all-input').keyup( () => {
   neighborhoods = [],
   allFound = [];
   highlightForSearch(placesAndProducts, markersCluster);
+  bairrosLayer.eachLayer( layer => {
+    layer.setStyle(bairroEstilo);
+  });
   document.getElementById('select-bairro-type').innerHTML = 'Bairro';
   document.getElementById('list-all-markers').innerHTML = '';
   if ( !searchField ) {
