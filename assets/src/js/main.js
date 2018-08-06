@@ -221,11 +221,12 @@ const bindPopup = ( feature, layer ) => {
               return acumulador;
             }, []);
 
-            popUpContent += `<span class="info-content">Produção:</span>`;
+            popUpContent += `<span class="info-content">Produtos disponíveis: </span><span> `;
 
             for (let tipo of tipos) {
-              popUpContent += `<span> ${tipo},`;
+              popUpContent +=` ${tipo},`;
             }
+
             popUpContent = popUpContent.slice(0,-1);
             popUpContent += `</span>`;
 
@@ -251,11 +252,12 @@ const bindPopup = ( feature, layer ) => {
             return acumulador;
           }, []);
 
-          popUpContent += `<span class="info-content">Produtos disponíveis: </span>`;
+          popUpContent += `<span class="info-content">Produtos disponíveis: </span><span> `;
 
           for (let tipo of tipos) {
-            popUpContent += `<span> ${tipo},`;
+            popUpContent +=` ${tipo},`;
           }
+
           popUpContent = popUpContent.slice(0,-1);
           popUpContent += `</span>`;
 
@@ -280,10 +282,10 @@ const bindPopup = ( feature, layer ) => {
               return acumulador;
             }, []);
 
-            popUpContent += `<span class="info-content">Produtos disponíveis: </span>`;
+            popUpContent += `<span class="info-content">Produtos disponíveis: </span><span> `;
 
             for (let tipo of tipos) {
-              popUpContent += `<span> ${tipo},`;
+              popUpContent +=` ${tipo},`;
             }
             popUpContent = popUpContent.slice(0,-1);
             popUpContent += `</span>`;
@@ -686,3 +688,50 @@ const moveToPoint = ( layerToSearch, name ) => {
     }
   });
 };
+
+//Script de contato
+document.getElementById('button-contato').onclick = () => {
+  enviarMensagem().then( response => {
+    console.log(response);
+  } );
+  document.getElementById('contact-form').addEventListener('submit', event => {
+    document.getElementById('contact-form').reset();
+    event.preventDefault();
+  });
+};
+
+
+const enviarMensagem = async () => {
+  const url = 'assets/dbscripts/sendmail.php';
+
+  let
+  nomeInput = document.getElementById('nome-contato').value,
+  emailInput = document.getElementById('email-contato').value,
+  telefoneInput = document.getElementById('telefone-contato').value,
+  mensagemInput = document.getElementById('mensagem-contato').value;
+
+  let informacoes = {
+    nome : nomeInput,
+    email: emailInput,
+    telefone : telefoneInput,
+    mensagem: mensagemInput
+  };
+
+  console.log(JSON.stringify(informacoes));
+
+  let fetchData = {
+    method: "POST",
+    body: JSON.stringify(informacoes)
+  };
+
+  try {
+      let response = await fetch( url, fetchData );
+      console.log('Resposta: ' + response);
+      if ( response.ok ) {
+        let jsonResponse = await response.json();
+        return jsonResponse;
+      }
+    } catch( e ) {
+      console.log( 'Erro log: ' + e );
+    }
+}
