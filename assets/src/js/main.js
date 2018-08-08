@@ -373,7 +373,7 @@ const buildModalFromLayer = layer => {
   body += `<h4>Produtos</h4>
           <table class="table table-hover">
             <caption>Lista de produtos</caption>
-            <thead class="table-dark" ">
+            <thead class="table-dark">
               <tr>
                 <th scope="col" style="width: 70%">Nome</th>
                 <th scope="col">Tipo</th>
