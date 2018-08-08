@@ -287,6 +287,11 @@ label {
 #switch-animal-label {
   background-color: #A7604C;
 }
+
+#locais-modal div .modal-header {
+  align-self: center;
+}
+
 /* Toogler Button Animation */
 .navbar-toggler:focus,
 .navbar-toggler:active {
@@ -451,7 +456,7 @@ a.leaflet-control-zoomhome-in, a.leaflet-control-zoomhome-out, a.leaflet-control
   #information-wrapper {
     padding: 5px;
     border-radius: 0;
-    margin: 0 0 -3px 0;
+    margin: 0 0 -3px -3px;
     background-color: var(--main-color);
   }
   
@@ -464,7 +469,17 @@ a.leaflet-control-zoomhome-in, a.leaflet-control-zoomhome-out, a.leaflet-control
 }
 
 #about-div img {
+  float: left;
   margin-right: 10px;
+}
+
+#about-div p {
+  text-align: justify;
+}
+
+.modal-body {
+  background: rgb(255,255,255);
+  background: linear-gradient(0deg, rgba(255,255,255,1) 99%, rgba(122,186,122,0.6587009803921569) 100%);
 }
 
 .inside-filter {
@@ -472,4 +487,15 @@ a.leaflet-control-zoomhome-in, a.leaflet-control-zoomhome-out, a.leaflet-control
  font-family: "Manteka";
  font-size: 13px;
  font-weight: bold;
+}
+
+.place-modal-content {
+  margin: 10px 0 10px 0;
+  border-width: 0 0 2px 0;
+  border-style: solid;
+  border-color: #888;
+}
+
+#locais-modal h4 {
+  text-align: center;
 }

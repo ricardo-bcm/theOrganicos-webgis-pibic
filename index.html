@@ -58,7 +58,7 @@
             <span id="select-layers-label" class="d-none d-sm-block labels-the-organicos">Buscar: Produtos, Locais, Bairros</span>
             <div id="search-all-div">
               <div class="input-group input-group-to-style">
-                <input type="search" class="form-control" id="search-all-input">
+                <input type="search" class="form-control" id="search-all-input" onclick="this.select()">
                 <span class="input-group-addon"><i class="fa fa-search"></i></span>
               </div>
               <ul class="list-group" id="search-all-results"></ul>
@@ -121,15 +121,15 @@
           </div>
           <div class="modal-body">
             <div class="conteiner-fluid" id="about-div">
-              <p>A aplicação TheOrgânicos é um sistema de informação geográfica voltada para web com funcionalidade de busca da localização das unidades produtoras e feiras de base agroecológica do município de Teresina, idealizada por alunos e professores do Instituto Federal do Piauí – IFPI, com o objetivo de estimular a alimentação saudável no município de Teresina e mostrar que os produtos agroecológicos podem ser mais acessíveis aos consumidores.</p>
+              <p>A aplicação TheOrgânicos é um sistema de informação geográfica voltada para web com funcionalidades de busca e localização das unidades produtoras e feiras de base agroecológica do município de Teresina. Idealizada por alunos e professores do Instituto Federal do Piauí – IFPI, com o objetivo de estimular a alimentação saudável e mostrar que os produtos agroecológicos podem ser mais acessíveis aos consumidores.</p>
 
-              <p>O mapa visa encurtar o caminho do consumidor até o produtor para ampliar o acesso aos alimentos de base agroecológica. Para fomentar os canais alternativos de comercialização, o mapa localiza:</p>
+              <p>O mapa visa encurtar o caminho do consumidor até o produtor, estimulando o acesso aos alimentos de base agroecológica. Para fomentar os canais alternativos de produção, comercialização e feiras de base agroecológica o mapa localiza:</p>
 
-              <p><img src="assets/images/produtor-marker.png" align="left"> <span class="p-text">Unidades produtoras: Unidades que produzem alimentos de base agroecológica do município de Teresina.</span></p><br>
+              <p><img src="assets/images/produtor-marker.png"> <span class="p-text">Unidades produtoras: Unidades que produzem alimentos de base agroecológica do município de Teresina.</span></p><br>
 
-              <p><img src="assets/images/feira-marker.png" align="left"> <span class="p-text">Feiras de base agroecológica: Feiras são espaços de comercialização como alternativa de comprar direta com o produtor, pois diminuem intermediários no processo e consequentemente o preço do produto. Localizando todas as feiras de base agroecológica do município de Teresina.</span></p>
+              <p><img src="assets/images/feira-marker.png""> <span class="p-text">Feiras de base agroecológica: Feiras são espaços de comercialização como alternativa de comprar direta com o produtor, pois diminuem intermediários no processo e consequentemente o preço do produto. Localizando todas as feiras de base agroecológica do município de Teresina.</span></p>
 
-              <p><img src="assets/images/comercio-marker.png"  align="left"> <span class="p-text">Comércios parceiros: Parceria entre o comercio intermediário com o produtor na venda dos produtos agroecológicos. Essa relação deve ser transparente e justa, com preços que beneficiem ambas as partes e o cliente</span></p>
+              <p><img src="assets/images/comercio-marker.png"> <span class="p-text">Comércios parceiros: Parceria entre o comercio intermediário com o produtor na venda dos produtos agroecológicos. Essa relação deve ser transparente e justa, com preços que beneficiem ambas as partes e o cliente.</span></p><br>
               <h4>Em parceria com</h4>
               <a href="http://libra.ifpi.edu.br" target="newtab">
                 <img src="assets/images/ifpi-logo.svg" alt="http://libra.ifpi.edu.br">
@@ -176,7 +176,7 @@
             </form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-primary" id="button-contato" data-dismiss="modal">Enviar</button>
+            <button type="button" class="btn btn-primary" id="button-contato">Enviar</button>
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
           </div>
         </div>
@@ -191,9 +191,22 @@
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
           </div>
           <div class="modal-body">
-            <div class="conteiner-fluid">
-              <h1>Conteúdo</h1>
-            </div>
+              <p>A aplicação TheOrgânicos foi desenvolvida por uma equipe composta por professores e alunos do Instituto Federal do Piauí - IFPI.</p>
+                <h2>Coordenadora</h2>
+                <p> Prof(a) Msc. Lilian Francisca Soares Melo<br>   
+                Email: lilianmelo@ifpi.edu.br<br>
+                </p>
+                <h3> Coorientadora</h3>
+                <p>Prof(a) Dr. Bruna de Freitas Iwata<br>
+                Email: iwata@ifpi.edu.br<br>
+                </p>
+                <h4> Desenvolvedores </h4>
+                <p> Antonio José de Sena Junior - Graduando em Geoprocessamento <br>
+                  Email: senageopro@gmail.com
+                </p> 
+                <p>Ricardo Barbosa da Cunha Macedo - Graduando em Análise e Desenvolvimento de Sistemas<br>
+                  Email: ricardobcm@outlook.com
+                </p>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>

@@ -27,7 +27,7 @@ MarkerIcon = L.Icon.extend({
     shadowUrl: 'assets/images/shadow.png',
     iconSize: [54, 71],
     iconAnchor: [27, 68],
-    popupAnchor: [-2, -61]
+    popupAnchor: [0, -65]
   }
 });
 
@@ -206,8 +206,8 @@ const bindPopup = ( feature, layer ) => {
       <div class="container-popup">
         <div class="content-popup">
           <h4 class="header-popup"> ${properties.nome} </h4>
-          <span class="info-content-text"><span class="info-content">Horário:</span> ${properties.horario_funcionamento_unidade_produtora}</span><br>
-          <span class="info-content">Telefone:</span> ${properties.contato_unidade_produtora}<br>
+          <span class="info-content-text"><span class="info-content">Horário de Atendimento:</span> ${properties.horario_funcionamento_unidade_produtora}</span><br>
+          <span class="info-content">Contato:</span> ${properties.contato_unidade_produtora}<br>
           <span class="info-content">Descricao:</span> ${properties.descricao_unidade_produtora}<br>`;
             let tipos = [];
             for (let produto of properties.produtos) {
@@ -238,7 +238,7 @@ const bindPopup = ( feature, layer ) => {
           <h4 class="header-popup"> ${properties.nome} </h4>
           <span class="info-content">Endereço:</span> ${properties.endereco_feira}<br>
           <span class="info-content">Horário:</span> ${properties.horario_funcionamento}<br>
-          <span class="info-content">Telefone:</span> ${properties.contato_feira}<br>
+          <span class="info-content">Contato:</span> ${properties.contato_feira}<br>
           <span class="info-content">Descricao:</span> ${properties.descricao_feira}<br>`;
           let tipos = [];
           for (let produto of properties.produtos) {
@@ -267,7 +267,7 @@ const bindPopup = ( feature, layer ) => {
       <div class="container-popup">
         <div class="content-popup">
           <h4 class="header-popup"> ${properties.nome} </h4>
-          <span class="info-content-text"><span class="info-content">Telefone:</span> ${properties.contato_comercio}</span><br>
+          <span class="info-content-text"><span class="info-content">Contato:</span> ${properties.contato_comercio}</span><br>
           <span class="info-content-text"><span class="info-content">CNPJ:</span> ${properties.cnpj_comercio}</span><br>
           <span class="info-content">Descrição:</span> ${properties.descricao_comercio}<br>`;
             let tipos = [];
@@ -323,7 +323,7 @@ loadLayers(putThemOnMap);
 const buildModalFromLayer = layer => {
   let 
   properties = layer.feature.properties,
-  header = `<h4 class="header-popup">${properties.nome}</h4>`,
+  header = `<h4>${properties.nome}</h4>`,
   body = ``;
 
   if (properties.imagens.length > 0) {
@@ -350,28 +350,32 @@ const buildModalFromLayer = layer => {
             </div>`;
   }
 
+  body += '<div class="place-modal-content">';
+
   if (properties.current_tipo === 'Unidade') {
-    body += `<span class="info-content">Horário:</span> ${properties.horario_funcionamento_unidade_produtora}<br>
-             <span class="info-content">Telefone:</span> ${properties.contato_unidade_produtora}<br><br>
+    body += `<span class="info-content">Horário de Atendimento:</span> ${properties.horario_funcionamento_unidade_produtora}<br>
+             <span class="info-content">Contato:</span> ${properties.contato_unidade_produtora}<br><br>
              <span class="info-content">Descrição:</span> ${properties.descricao_unidade_produtora}`;
   } else if (properties.current_tipo === 'Feira') {
     body += `<span class="info-content">Endereço:</span> ${properties.endereco_feira}<br>
-             <span class="info-content">Horário:</span> ${properties.horario_funcionamento}<br>
-             <span class="info-content">Telefone:</span> ${properties.contato_feira}<br><br>
+             <span class="info-content">Horário de Atendimento:</span> ${properties.horario_funcionamento}<br>
+             <span class="info-content">Contato:</span> ${properties.contato_feira}<br><br>
              <span class="info-content">Descrição:</span> ${properties.descricao_feira}`;
   } else if (properties.current_tipo === 'Comercio') {
     body += `<span class="info-content">Endereço:</span> ${properties.endereco_comercio}<br>
-             <span class="info-content">Horário:</span> ${properties.horario_funcionamento_comercio}<br>
-             <span class="info-content">Telefone:</span> ${properties.contato_comercio}<br><br>
+             <span class="info-content">Horário de Atendimento:</span> ${properties.horario_funcionamento_comercio}<br>
+             <span class="info-content">Contato:</span> ${properties.contato_comercio}<br><br>
              <span class="info-content">Descrição:</span> ${properties.descricao_comercio}`;
   }
 
+  body += '</div>';
+
   body += `<h4>Produtos</h4>
-          <table class="table table-striped table-hover">
+          <table class="table table-hover">
             <caption>Lista de produtos</caption>
-            <thead class="thead-dark">
+            <thead class="table-dark" ">
               <tr>
-                <th scope="col">Nome</th>
+                <th scope="col" style="width: 70%">Nome</th>
                 <th scope="col">Tipo</th>
               </tr>
             </thead>
@@ -506,7 +510,7 @@ $('#search-all-input').keyup( () => {
     allFound = placesAndProducts.concat(neighborhoods);
 
     if (allFound.length === 0) {
-      listSearch += `<li class="list-group-item">Nenhum resultado`;
+      listSearch += `<li class="list-group-item disabled">Nenhum resultado`;
     }
     else {
       allFound.sort();
@@ -559,13 +563,17 @@ const highlightForSearch = (nomes, layerGroup) => {
 
 $('#search-all-results').on('click', 'li', e => {
   let inputValue = $(e.target.childNodes[0]).text().trim();
-  $('#search-all-input').val( inputValue );
-  let layer = getLayerByAttribute(markersCluster,inputValue);
-  if (markersCluster.hasLayer(layer)) {
-    moveToPoint( markersCluster, inputValue );
+  if (inputValue === 'Nenhum resultado') {
+    $('#search-all-input').val('');
   } else {
-    moveToPolygon( bairrosLayer, inputValue );
-    getPointsInsideNeighborhood(inputValue).then( response => list(response) );
+    $('#search-all-input').val( inputValue );
+    let layer = getLayerByAttribute(markersCluster,inputValue);
+    if (markersCluster.hasLayer(layer)) {
+      moveToPoint( markersCluster, inputValue );
+    } else {
+      moveToPolygon( bairrosLayer, inputValue );
+      getPointsInsideNeighborhood(inputValue).then( response => list(response) );
+    }
   }
   document.getElementById('search-all-results').innerHTML = '';
 });
@@ -691,15 +699,16 @@ const moveToPoint = ( layerToSearch, name ) => {
 
 //Script de contato
 document.getElementById('button-contato').onclick = () => {
+  $('#contatoModal').find('.modal-header').html('<h4>Enviando mensagem...<h4>');
   enviarMensagem().then( response => {
-    console.log(response);
-  } );
-  document.getElementById('contact-form').addEventListener('submit', event => {
     document.getElementById('contact-form').reset();
-    event.preventDefault();
-  });
+    $('#contatoModal').find('.modal-header').html('<h4>Mensagem enviada!</h4>');
+  } );
 };
 
+$('#contatoModal').on('hidden.bs.modal', function (e) {
+  $('#contatoModal').find('.modal-header').html('<h4>Envie-nos uma mensagem</h4>');
+});
 
 const enviarMensagem = async () => {
   const url = 'assets/dbscripts/sendmail.php';
@@ -717,8 +726,6 @@ const enviarMensagem = async () => {
     mensagem: mensagemInput
   };
 
-  console.log(JSON.stringify(informacoes));
-
   let fetchData = {
     method: "POST",
     body: JSON.stringify(informacoes)
@@ -726,7 +733,6 @@ const enviarMensagem = async () => {
 
   try {
       let response = await fetch( url, fetchData );
-      console.log('Resposta: ' + response);
       if ( response.ok ) {
         let jsonResponse = await response.json();
         return jsonResponse;
