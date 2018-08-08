@@ -82,20 +82,6 @@ map.on('contextmenu', e => e);
 // Controles
 L.Control.zoomHome().addTo( map );
 
-let mySource = L.WMS.Source.extend({
-    'showFeatureInfo': function(latlng, info) {
-        //Do nothing
-    }
-});
-
-let source = new mySource("http://localhost:8080/geoserver/the_organicos_ws/wms", {
-    'transparent': true,
-    'format':'image/png'
-});
-let zonaRuralLayer = source.getLayer("teresina");
-zonaRuralLayer.addTo(map);
-
-
 let //Minimapa
 streetsMinimapLayer = new L.TileLayer( mapboxUrl, {
   attribution: attrib,
@@ -124,6 +110,13 @@ basemapsOptions = {
   tileZ: 1
 };
 L.control.basemaps( basemapsOptions ).addTo( map );
+
+let teresinaLayer =  L.tileLayer.wms('http://localhost:8080/geoserver/the_organicos_ws/wms?',{
+  layers: "the_organicos_ws:teresina",
+  transparent: true,
+  format:"image/png"
+}).addTo(map);
+
 
 let
 latLngOptions = {
@@ -214,12 +207,7 @@ const bindPopup = ( feature, layer ) => {
               tipos.push(produto.tipo_produto);
             }
 
-            tipos = tipos.reduce(function (acumulador, nome) {
-              if (acumulador.indexOf(nome) == -1) {
-                acumulador.push(nome)
-              }
-              return acumulador;
-            }, []);
+            tipos = reduceArray(tipos);
 
             popUpContent += `<span class="info-content">Produtos disponíveis: </span><span> `;
 
@@ -245,12 +233,7 @@ const bindPopup = ( feature, layer ) => {
             tipos.push(produto.tipo_produto);
           }
 
-          tipos = tipos.reduce(function (acumulador, nome) {
-            if (acumulador.indexOf(nome) == -1) {
-              acumulador.push(nome)
-            }
-            return acumulador;
-          }, []);
+          tipos = reduceArray(tipos);
 
           popUpContent += `<span class="info-content">Produtos disponíveis: </span><span> `;
 
@@ -275,12 +258,7 @@ const bindPopup = ( feature, layer ) => {
               tipos.push(produto.tipo_produto);
             }
 
-            tipos = tipos.reduce(function (acumulador, nome) {
-              if (acumulador.indexOf(nome) == -1) {
-                acumulador.push(nome)
-              }
-              return acumulador;
-            }, []);
+            tipos = reduceArray(tipos);
 
             popUpContent += `<span class="info-content">Produtos disponíveis: </span><span> `;
 
@@ -471,12 +449,13 @@ const layersForType = () => {
 // Busca geral
 $('#search-all-input').keyup( () => {
   let
-  searchField = $('#search-all-input').val(),
+  searchField = removeAccents( $('#search-all-input').val() ),
   regex = new RegExp( searchField, "i" ),
   listSearch = '',
   placesAndProducts = [],
   neighborhoods = [],
   allFound = [];
+
   highlightForSearch(placesAndProducts, markersCluster);
   bairrosLayer.eachLayer( layer => {
     layer.setStyle(bairroEstilo);
@@ -489,12 +468,12 @@ $('#search-all-input').keyup( () => {
     markersCluster.eachLayer( layer => {
       let properties = layer.feature.properties;
       //Busca por local
-      if ( properties.nome.search(regex) != -1 && searchField){
+      if ( removeAccents( properties.nome ).search(regex) != -1 && searchField){
         placesAndProducts.push(layer.feature.properties.nome);
       }
       //Busca por produto 
       for (let produto of properties.produtos) {
-        if(produto.nome_produto.search(regex) != -1 && searchField){
+        if(removeAccents( produto.nome_produto ).search(regex) != -1 && searchField){
           placesAndProducts.push(properties.nome);
         }
       }
@@ -502,7 +481,7 @@ $('#search-all-input').keyup( () => {
     //Busca por bairro
     bairrosLayer.eachLayer( layer => {
       layer.setStyle(bairroEstilo);
-      if ( layer.feature.properties.nome.search(regex) != -1 &&  searchField){
+      if ( removeAccents( layer.feature.properties.nome ).search(regex) != -1 &&  searchField){
         neighborhoods.push(layer.feature.properties.nome);
       }
     });
@@ -514,13 +493,7 @@ $('#search-all-input').keyup( () => {
     }
     else {
       allFound.sort();
-      allFound = allFound.reduce(function (acumulador, nome) {
-        if (acumulador.indexOf(nome) == -1) {
-          acumulador.push(nome)
-        }
-        return acumulador;
-      }, []);
-
+      allFound = reduceArray(allFound);
       allFound = allFound.slice(0,7);
 
       for (let localName of allFound) {
@@ -572,7 +545,7 @@ $('#search-all-results').on('click', 'li', e => {
       moveToPoint( markersCluster, inputValue );
     } else {
       moveToPolygon( bairrosLayer, inputValue );
-      getPointsInsideNeighborhood(inputValue).then( response => list(response) );
+      getPointsInsideNeighborhood(inputValue).then( response => listLocaisInNeighborhoods( response ) );
     }
   }
   document.getElementById('search-all-results').innerHTML = '';
@@ -581,7 +554,9 @@ $('#search-all-results').on('click', 'li', e => {
 const getPointsInsideNeighborhood = async nome => {
   const url = 'assets/dbscripts/locaisporbairro.php';
 
-  document.getElementById('select-bairro-type').innerHTML = nome;
+  let nomeWithoutAccents = nome.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+
+  document.getElementById('select-bairro-type').innerHTML = nomeWithoutAccents;
 
   let information = {
     name : nome
@@ -603,15 +578,15 @@ const getPointsInsideNeighborhood = async nome => {
   }
 }
 
-const list = list => {
+const listLocaisInNeighborhoods = listOfLocais => {
   let 
-  text = '',
+  list = '',
   name = [];
-  for (let item of list) {
-    text += `<li class="list-group-item link-class">${item.nome}<br></li>`;
+  for (let item of listOfLocais) {
+    list += `<li class="list-group-item link-class">${item.nome}<br></li>`;
     name.push(item.nome);
   }
-  document.getElementById('list-all-markers').innerHTML = text;
+  document.getElementById('list-all-markers').innerHTML = list;
   sycronizeListMarkers(name);
 }
 
@@ -696,48 +671,3 @@ const moveToPoint = ( layerToSearch, name ) => {
     }
   });
 };
-
-//Script de contato
-document.getElementById('button-contato').onclick = () => {
-  $('#contatoModal').find('.modal-header').html('<h4>Enviando mensagem...<h4>');
-  enviarMensagem().then( response => {
-    document.getElementById('contact-form').reset();
-    $('#contatoModal').find('.modal-header').html('<h4>Mensagem enviada!</h4>');
-  } );
-};
-
-$('#contatoModal').on('hidden.bs.modal', function (e) {
-  $('#contatoModal').find('.modal-header').html('<h4>Envie-nos uma mensagem</h4>');
-});
-
-const enviarMensagem = async () => {
-  const url = 'assets/dbscripts/sendmail.php';
-
-  let
-  nomeInput = document.getElementById('nome-contato').value,
-  emailInput = document.getElementById('email-contato').value,
-  telefoneInput = document.getElementById('telefone-contato').value,
-  mensagemInput = document.getElementById('mensagem-contato').value;
-
-  let informacoes = {
-    nome : nomeInput,
-    email: emailInput,
-    telefone : telefoneInput,
-    mensagem: mensagemInput
-  };
-
-  let fetchData = {
-    method: "POST",
-    body: JSON.stringify(informacoes)
-  };
-
-  try {
-      let response = await fetch( url, fetchData );
-      if ( response.ok ) {
-        let jsonResponse = await response.json();
-        return jsonResponse;
-      }
-    } catch( e ) {
-      console.log( 'Erro log: ' + e );
-    }
-}

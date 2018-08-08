@@ -18,4 +18,3 @@
     $result = pg_query( $connexion, $query);
 
     $json = json_encode($result);
- ?>

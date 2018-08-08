@@ -55,5 +55,3 @@ if ( !isset( $data ) || empty($data) || $data === NULL ) {
         echo $encoded;
   }
 } //Fim else
- ?>
- 

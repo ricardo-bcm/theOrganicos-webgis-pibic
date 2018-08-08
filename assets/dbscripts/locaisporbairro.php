@@ -47,5 +47,3 @@ $arrayResult = array_merge($feiras, $comercios, $unidadeProdutoras);
 $json = json_encode($arrayResult,JSON_UNESCAPED_UNICODE);
 
 echo $json;
-
- ?>

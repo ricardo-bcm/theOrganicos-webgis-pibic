@@ -246,7 +246,7 @@ label {
     width: 40px;
 }
 .material-switch > label::after {
-    background: #fff;
+    background: #686b5b;
     border-radius: 3px;
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
     content: '';
@@ -277,15 +277,15 @@ label {
 }
 
 #switch-horticolas-label {
-  background-color: #2BCD1A;
+  background-color: #29a8de;
 }
 
 #switch-frutiferas-label {
-  background-color: #F97605;
+  background-color: #29a8de;
 }
 
 #switch-animal-label {
-  background-color: #A7604C;
+  background-color: #29a8de;
 }
 
 #locais-modal div .modal-header {
@@ -499,3 +499,4 @@ a.leaflet-control-zoomhome-in, a.leaflet-control-zoomhome-out, a.leaflet-control
 #locais-modal h4 {
   text-align: center;
 }
+
