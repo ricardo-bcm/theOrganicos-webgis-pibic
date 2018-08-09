@@ -554,9 +554,7 @@ $('#search-all-results').on('click', 'li', e => {
 const getPointsInsideNeighborhood = async nome => {
   const url = 'assets/dbscripts/locaisporbairro.php';
 
-  let nomeWithoutAccents = nome.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
-
-  document.getElementById('select-bairro-type').innerHTML = nomeWithoutAccents;
+  document.getElementById('select-bairro-type').innerHTML = removeAccents( nome );
 
   let information = {
     name : nome

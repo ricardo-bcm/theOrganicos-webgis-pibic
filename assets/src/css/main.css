@@ -500,3 +500,6 @@ a.leaflet-control-zoomhome-in, a.leaflet-control-zoomhome-out, a.leaflet-control
   text-align: center;
 }
 
+#about-div a img {
+  margin-bottom: 0;
+}
