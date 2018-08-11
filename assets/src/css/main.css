@@ -65,7 +65,7 @@ body {
   padding: 0;
 }
 
-#map { 
+#map {
   width: 100%;
   height: 100%;
 }
@@ -116,13 +116,9 @@ body {
   font-size: small;
 }
 
-.produtosNaLista {
-  font-size: 10px;
-}
-
-.tituloNaLista {
+.titulo-lista {
   font-weight: bolder;
-  font-size: 18px;
+  font-size: 15px;
 }
 
 
@@ -151,18 +147,18 @@ body {
 }
 
 .input-group-to-style .input-group-addon {
-    border-color: #CED4DA;
-    background-color: #fff;
+  border-color: #CED4DA;
+  background-color: #fff;
 }
 
 .input-group.input-group-to-style input.form-control {
-    -webkit-border-radius: 4px;
-       -moz-border-radius: 4px;
-            border-radius: 4px;
-            border-right: 0;
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 0;
-            box-shadow:none !important;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+          border-right: 0;
+          border-top-right-radius: 0;
+          border-bottom-right-radius: 0;
+          box-shadow:none !important;
 }
 
 label {
@@ -176,92 +172,93 @@ label {
 }
 
 .botao-mais {
-    background: transparent;
-    font-size: 12px;
-    position: absolute;
-    bottom: 0;
-    right: -7px;
+  background: transparent;
+  font-size: 12px;
+  position: absolute;
+  bottom: 0;
+  right: -7px;
 }
 
 .botao-mais a {
-    background: #7ABA7A;
-    border: none;
-    display: inline-block;
-    height: 27px;
-    line-height: 28px;
-    position: relative;
-    text-decoration: none;
-    width: 74px
+  background: #7ABA7A;
+  border: none;
+  display: inline-block;
+  height: 27px;
+  line-height: 28px;
+  position: relative;
+  text-decoration: none;
+  width: 74px
 }
 
 .botao-mais a:before{
-    background: #7ABA7A;
-    border: none;
-    content: '';
-    display: block;
-    height: 26px;
-    left: 58px;
-    position: absolute;
-    top: 0;
-    -moz-transform: rotate(45deg);
-    -webkit-transform: rotate(45deg);
-    -o-transform: rotate(45deg);
-    transform: rotate(45deg);
-    width: 26px;
+  background: #7ABA7A;
+  border: none;
+  content: '';
+  display: block;
+  height: 26px;
+  left: 58px;
+  position: absolute;
+  top: 0;
+  width: 26px;
+  -webkit-transform: rotate(45deg);
+     -moz-transform: rotate(45deg);
+       -o-transform: rotate(45deg);
+          transform: rotate(45deg);
 }
 
 .botao-mais a button {
-    color: #fff;
-    background: none;
-    border: none;
-    position: relative;
-    width: 78px;
-    height: 20px;
-    font-size: 17px;
-    font-family: 'Manteka'
+  color: #fff;
+  background: none;
+  border: none;
+  position: relative;
+  width: 78px;
+  height: 20px;
+  font-size: 17px;
+  font-family: 'Manteka'
 }
 
 /*Checkbox estilo material design*/
 .material-switch > input[type="checkbox"] {
-    display: none;   
+  display: none;   
 }
 
 .material-switch > label {
-    cursor: pointer;
-    height: 0px;
-    position: relative; 
-    width: 40px;  
+  cursor: pointer;
+  height: 0px;
+  position: relative; 
+  width: 40px;  
 }
 
 .material-switch > label::before {
-    background: #000;
-    box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.5);
-    border-radius: 4px;
-    content: '';
-    height: 16px;
-    margin-top: -4px;
-    position:absolute;
-    opacity: 0.3;
-    transition: all 0.2s ease-in-out;
-    width: 40px;
+  background: #000;
+  box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+  content: '';
+  height: 16px;
+  margin-top: -4px;
+  position:absolute;
+  opacity: 0.3;
+  transition: all 0.2s ease-in-out;
+  width: 40px;
 }
+
 .material-switch > label::after {
-    background: #686b5b;
-    border-radius: 3px;
-    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
-    content: '';
-    height: 18px;
-    left: -2px;
-    margin-top: -7px;
-    position: absolute;
-    top: 2px;
-    transition: all 0.2s ease-in-out;
-    width: 20px;
+  background: #686b5b;
+  border-radius: 3px;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+  content: '';
+  height: 18px;
+  left: -2px;
+  margin-top: -7px;
+  position: absolute;
+  top: 2px;
+  transition: all 0.2s ease-in-out;
+  width: 20px;
 }
 
 .material-switch > input[type="checkbox"]:checked + label::after {
-    background: inherit;
-    left: 25px;
+  background: inherit;
+  left: 25px;
 }
 
 #switch-feira-label {
@@ -295,7 +292,7 @@ label {
 /* Toogler Button Animation */
 .navbar-toggler:focus,
 .navbar-toggler:active {
-    outline: 0;
+  outline: 0;
 }
 
 .navbar-toggler span {
@@ -323,40 +320,41 @@ label {
 }
 
 .navbar-toggler:not(.collapsed) span:nth-child(1) {
-    position: relative;
-    top: 10px;
-    opacity: 0.9;
-    -webkit-transform: rotate(135deg);
-       -moz-transform: rotate(135deg);
-         -o-transform: rotate(135deg);
-            transform: rotate(135deg);
+  position: relative;
+  top: 10px;
+  opacity: 0.9;
+  -webkit-transform: rotate(135deg);
+     -moz-transform: rotate(135deg);
+       -o-transform: rotate(135deg);
+          transform: rotate(135deg);
 }
 
 .navbar-toggler:not(.collapsed) span:nth-child(2) {
-    height: 12px;
-    visibility: hidden;
-    background-color: transparent;
+  height: 12px;
+  visibility: hidden;
+  background-color: transparent;
 }
 
 .navbar-toggler:not(.collapsed) span:nth-child(3) {
-    position: relative;
-    top: -12px;
-    opacity: 0.9;
-    -webkit-transform: rotate(-135deg);
-       -moz-transform: rotate(-135deg);
-         -o-transform: rotate(-135deg);
-            transform: rotate(-135deg);
+  position: relative;
+  top: -12px;
+  opacity: 0.9;
+  -webkit-transform: rotate(-135deg);
+     -moz-transform: rotate(-135deg);
+       -o-transform: rotate(-135deg);
+          transform: rotate(-135deg);
 }
 
 /*Leaflet my styles*/
 .leaflet-popup-content-wrapper {
-  border-radius: 3px; s
+  border-radius: 3px;
   box-shadow: 0 0 0 0;
-  margin:0;
+  margin: 0;
   padding: 0;
-  border-color: var(--popup-color);
+  border-color: transparent;
   border-width: 1px;
   border-style: solid;
+  border-bottom-color: var(--main-color);
 }
 
 .leaflet-popup-tip {
@@ -379,25 +377,25 @@ a.leaflet-control-zoomhome-in, a.leaflet-control-zoomhome-out, a.leaflet-control
 
 .leaflet-control-minimap.leaflet-container.leaflet-touch.leaflet-fade-anim.leaflet-grab.leaflet-touch-drag.leaflet-touch-zoom.leaflet-control {
   border: 1px solid #fff;
-  -webkit-box-shadow: 4px 3px 9px rgba(0,0,0,.65); 
-     -moz-box-shadow: 4px 3px 9px rgba(0,0,0,.65); 
-          box-shadow: 4px 3px 9px rgba(0,0,0,.65); 
+  -webkit-box-shadow: 4px 3px 9px rgba(0,0,0,.65);
+     -moz-box-shadow: 4px 3px 9px rgba(0,0,0,.65);
+          box-shadow: 4px 3px 9px rgba(0,0,0,.65);
 }
 
 .leaflet-control-minimap {
   border: 1px solid #fff;
-  -webkit-box-shadow: 4px 3px 9px rgba(0,0,0,.65); 
-     -moz-box-shadow: 4px 3px 9px rgba(0,0,0,.65); 
-          box-shadow: 4px 3px 9px rgba(0,0,0,.65); 
+  -webkit-box-shadow: 4px 3px 9px rgba(0,0,0,.65);
+     -moz-box-shadow: 4px 3px 9px rgba(0,0,0,.65);
+          box-shadow: 4px 3px 9px rgba(0,0,0,.65);
 }
 
 .basemap.alt img  {
   border: 1px solid #fff;
   border-radius: 3px;
   margin-right: -5px;
-  -webkit-box-shadow: 3px 5px 5px rgba(0,0,0,.65); 
-     -moz-box-shadow: 3px 5px 5px rgba(0,0,0,.65); 
-          box-shadow: 3px 5px 5px rgba(0,0,0,.65);  
+  -webkit-box-shadow: 3px 5px 5px rgba(0,0,0,.65);
+     -moz-box-shadow: 3px 5px 5px rgba(0,0,0,.65);
+          box-shadow: 3px 5px 5px rgba(0,0,0,.65);
 }
 
 .container-popup {
@@ -415,6 +413,20 @@ a.leaflet-control-zoomhome-in, a.leaflet-control-zoomhome-out, a.leaflet-control
 
 .info-content-text {
   white-space: nowrap;
+}
+
+#about-div img {
+  float: left;
+  margin-right: 10px;
+}
+
+#about-div p {
+  text-align: justify;
+}
+
+.modal-body {
+  background: rgb(255,255,255);
+  background: linear-gradient(0deg, rgba(255,255,255,1) 99%, rgba(122,186,122,0.6587009803921569) 100%);
 }
 
 @media (min-width: 576px) {
@@ -466,40 +478,4 @@ a.leaflet-control-zoomhome-in, a.leaflet-control-zoomhome-out, a.leaflet-control
     color: #fff;
     margin: 10px 0 0 0;
   }
-}
-
-#about-div img {
-  float: left;
-  margin-right: 10px;
-}
-
-#about-div p {
-  text-align: justify;
-}
-
-.modal-body {
-  background: rgb(255,255,255);
-  background: linear-gradient(0deg, rgba(255,255,255,1) 99%, rgba(122,186,122,0.6587009803921569) 100%);
-}
-
-.inside-filter {
- text-align: center;
- font-family: "Manteka";
- font-size: 13px;
- font-weight: bold;
-}
-
-.place-modal-content {
-  margin: 10px 0 10px 0;
-  border-width: 0 0 2px 0;
-  border-style: solid;
-  border-color: #888;
-}
-
-#locais-modal h4 {
-  text-align: center;
-}
-
-#about-div a img {
-  margin-bottom: 0;
 }

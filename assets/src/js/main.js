@@ -10,7 +10,8 @@ unidadesLayer = L.layerGroup(),
 feirasLayer = L.layerGroup(),
 comerciosLayer = L.layerGroup(),
 bairrosLayer = L.layerGroup(),
-searchLayer = L.featureGroup();
+searchLayer = L.featureGroup(),
+bairrosIDs = [];
 
 //Agrupador de marcadores
 let
@@ -151,27 +152,10 @@ const bindBairrosPopUp = (feature, layer ) => {
 }
 
 const loadLayers = callback => {
-    $.getJSON('assets/dbscripts/feiras.php', data => {
-    let geoJsonFeiraLayer = L.geoJson( data, {
-      pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome}),
-      onEachFeature: bindPopup
-    });
-    feirasLayerToControl.addTo( map );
-  });
-  $.getJSON('assets/dbscripts/unidadesprodutoras.php', data => {
-    let geoJsonFeiraLayer = L.geoJson( data, {
-      pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome}),
-      onEachFeature: bindPopup
-    });
-    unidadesLayerToControl.addTo( map );
-  });
-  $.getJSON('assets/dbscripts/comercios.php', data => {
-    let geoJsonFeiraLayer = L.geoJson( data, {
-      pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome}),
-      onEachFeature: bindPopup
-    });
-    comerciosLayerToControl.addTo( map );
-  });
+  loadLayerFromScript('assets/dbscripts/feiras.php', feirasLayerToControl);
+  loadLayerFromScript('assets/dbscripts/unidadesprodutoras.php', unidadesLayerToControl);
+  loadLayerFromScript('assets/dbscripts/comercios.php', comerciosLayerToControl);
+    
   $.getJSON('assets/dbscripts/bairros.php', data => {
     let bairrosGeoJsonLayer = L.geoJson( data , {
       onEachFeature: bindBairrosPopUp,
@@ -183,6 +167,16 @@ const loadLayers = callback => {
   });
 
   callback();
+}
+
+const loadLayerFromScript = ( url, featureGroup ) => {
+  $.getJSON(url, data => {
+    let geoJsonFeiraLayer = L.geoJson( data, {
+      pointToLayer: ( feature, latlng ) => L.marker( latlng, {icon: iconMarkers[feature.properties.current_tipo], title: feature.properties.nome}),
+      onEachFeature: bindPopup
+    });
+    featureGroup.addTo( map );
+  });
 }
 
 const putThemOnMap = () => {
@@ -202,23 +196,6 @@ const bindPopup = ( feature, layer ) => {
           <span class="info-content-text"><span class="info-content">Horário de Atendimento:</span> ${properties.horario_funcionamento_unidade_produtora}</span><br>
           <span class="info-content">Contato:</span> ${properties.contato_unidade_produtora}<br>
           <span class="info-content">Descricao:</span> ${properties.descricao_unidade_produtora}<br>`;
-            let tipos = [];
-            for (let produto of properties.produtos) {
-              tipos.push(produto.tipo_produto);
-            }
-
-            tipos = reduceArray(tipos);
-
-            popUpContent += `<span class="info-content">Produtos disponíveis: </span><span> `;
-
-            for (let tipo of tipos) {
-              popUpContent +=` ${tipo},`;
-            }
-
-            popUpContent = popUpContent.slice(0,-1);
-            popUpContent += `</span>`;
-
-          popUpContent += `</div>`;
   } else if (properties.current_tipo === 'Feira') {
       popUpContent += `
       <div class="container-popup">
@@ -228,23 +205,6 @@ const bindPopup = ( feature, layer ) => {
           <span class="info-content">Horário:</span> ${properties.horario_funcionamento}<br>
           <span class="info-content">Contato:</span> ${properties.contato_feira}<br>
           <span class="info-content">Descricao:</span> ${properties.descricao_feira}<br>`;
-          let tipos = [];
-          for (let produto of properties.produtos) {
-            tipos.push(produto.tipo_produto);
-          }
-
-          tipos = reduceArray(tipos);
-
-          popUpContent += `<span class="info-content">Produtos disponíveis: </span><span> `;
-
-          for (let tipo of tipos) {
-            popUpContent +=` ${tipo},`;
-          }
-
-          popUpContent = popUpContent.slice(0,-1);
-          popUpContent += `</span>`;
-
-        popUpContent += `</div>`;
   } else if (properties.current_tipo === 'Comercio') {
       popUpContent += `
       <div class="container-popup">
@@ -253,23 +213,22 @@ const bindPopup = ( feature, layer ) => {
           <span class="info-content-text"><span class="info-content">Contato:</span> ${properties.contato_comercio}</span><br>
           <span class="info-content-text"><span class="info-content">CNPJ:</span> ${properties.cnpj_comercio}</span><br>
           <span class="info-content">Descrição:</span> ${properties.descricao_comercio}<br>`;
-            let tipos = [];
-            for (let produto of properties.produtos) {
-              tipos.push(produto.tipo_produto);
-            }
-
-            tipos = reduceArray(tipos);
-
-            popUpContent += `<span class="info-content">Produtos disponíveis: </span><span> `;
-
-            for (let tipo of tipos) {
-              popUpContent +=` ${tipo},`;
-            }
-            popUpContent = popUpContent.slice(0,-1);
-            popUpContent += `</span>`;
-
-          popUpContent += `</div>`;
   }
+  let tipos = [];
+  for (let produto of properties.produtos) {
+    tipos.push(produto.tipo_produto);
+  }
+
+  tipos = reduceArray(tipos);
+
+  popUpContent += `<span class="info-content">Produtos disponíveis: </span><span> `;
+
+  for (let tipo of tipos) {
+    popUpContent +=` ${tipo},`;
+  }
+
+  popUpContent = popUpContent.slice(0,-1);
+  popUpContent += `</span></div>`;
 
   popUpContent += `</div>
                    <div class="botao-mais">
@@ -432,18 +391,18 @@ const layersForType = () => {
     'PRODUCAO ANIMAL': $('#switch-animal').is(':checked')
   }
 
-    searchLayer.eachLayer( layer => {
-      let tipos = layer.feature.properties.tipos_produtos,
-      cont = 0;
-      for (let tipoL of tipos) {
-        cont += tipoEstado[tipoL];
-      }
-      if (cont < 1) {
-        markersCluster.removeLayer(layer);
-      } else if (cont > 0 && !markersCluster.hasLayer(layer)) {
-        markersCluster.addLayer(layer);
-      }
-    })
+  searchLayer.eachLayer( layer => {
+    let tipos = layer.feature.properties.tipos_produtos,
+    cont = 0;
+    for (let tipo of tipos) {
+      cont += tipoEstado[tipo];
+    }
+    if (cont < 1) {
+      markersCluster.removeLayer(layer);
+    } else if (cont > 0 && !markersCluster.hasLayer(layer)) {
+      markersCluster.addLayer(layer);
+    }
+  })
 }
 
 // Busca geral
@@ -456,14 +415,16 @@ $('#search-all-input').keyup( () => {
   neighborhoods = [],
   allFound = [];
 
-  highlightForSearch(placesAndProducts, markersCluster);
-  bairrosLayer.eachLayer( layer => {
-    layer.setStyle(bairroEstilo);
-  });
   document.getElementById('select-bairro-type').innerHTML = 'Bairro';
   document.getElementById('list-all-markers').innerHTML = '';
   if ( !searchField ) {
     document.getElementById('search-all-results').innerHTML = '';
+    console.log(bairrosIDs);
+    highlightForSearch(placesAndProducts, markersCluster);
+    for (let id of bairrosIDs) {
+      bairrosLayer.getLayer(id).setStyle(bairroEstilo);
+    }
+    bairrosIDs.length = 0;
   } else {
     markersCluster.eachLayer( layer => {
       let properties = layer.feature.properties;
@@ -480,9 +441,9 @@ $('#search-all-input').keyup( () => {
     });
     //Busca por bairro
     bairrosLayer.eachLayer( layer => {
-      layer.setStyle(bairroEstilo);
       if ( removeAccents( layer.feature.properties.nome ).search(regex) != -1 &&  searchField){
         neighborhoods.push(layer.feature.properties.nome);
+        bairrosIDs.push(layer._leaflet_id);
       }
     });
     //Configuração da listagem
@@ -498,17 +459,7 @@ $('#search-all-input').keyup( () => {
 
       for (let localName of allFound) {
         let layer = getLayerByAttribute(markersCluster, localName);
-        let layerBairro = getLayerByAttribute(bairrosLayer, localName);
-        listSearch += `<li class="list-group-item link-class"><span class="tituloNaLista">${localName}</span> <br>`;
-        if (!bairrosLayer.hasLayer(layerBairro)) {
-          listSearch += `<span class="produtosNaLista">`;
-          layer.feature.properties.produtos.forEach((produto, index) => {
-            if (index < 5) {
-              listSearch += `${produto.nome_produto}, `;
-            }
-          });
-          listSearch += `...</span>`;
-        }
+        listSearch += `<li class="list-group-item link-class"><span class="titulo-lista">${localName}</span> <br>`;
       }
       highlightForSearch(placesAndProducts, markersCluster);
     }
@@ -641,6 +592,7 @@ const moveToPolygon = (layerToSearch, name ) => {
   let groupLayer = L.featureGroup();
   layerToSearch.eachLayer( layer => {
     if ( layer.feature.properties.nome === name ){
+      console.log('Entrou: ' + name);
       layer.setStyle(bairroDestaqueEstilo);
       groupLayer.addLayer(layer);
     }
